@@ -45,6 +45,7 @@ use Illuminate\Support\Facades\Validator;
 use Intervention\Image\Facades\Image;
 use Illuminate\Support\Str;
 use PDF;
+use Illuminate\Support\Facades\Log;
 
 class DashboardController extends Controller
 {
@@ -55,7 +56,7 @@ class DashboardController extends Controller
      */
     public function index()
     {
-        $roles = Rol::where('id',2)->orderBy('id')->pluck('name', 'id')->toArray();
+        $roles = Rol::where('id', 2)->orderBy('id')->pluck('name', 'id')->toArray();
         return view('dashboard', compact('roles'));
     }
 
@@ -84,7 +85,8 @@ class DashboardController extends Controller
         }
     }
 
-    public function storeEmployee(Request $request){
+    public function storeEmployee(Request $request)
+    {
         $rules = [
             'name' => 'required|max:50',
             'last_name' => 'required|max:100',
@@ -102,65 +104,67 @@ class DashboardController extends Controller
             'id_rol' => 'required|integer|exists:rol,id',
             'picture_upload' => 'image|max:10240' //kilobytes 10240 = 10mb
         ];
-        $messages=[
+        $messages = [
             'picture_upload.image' => 'La foto del empleado debe ser en formato de imagen como: jpg, png.',
             'picture_upload.max' => 'La foto del empleado no puede ser mayor a 10 mb.',
         ];
-        $customAttr=[
+        $customAttr = [
             'name' => 'nombre',
-           'last_name' => 'apellidos',
-           'user_name' => 'nombre de usuario',
-           'tel' => 'teléfono',
-           'address' => 'dirección',
-           'sex' => 'sexo',
-           'date_of_birth' => 'fecha de nacimiento',
-           'observation' => 'observaciones',
-           'picture_upload' => 'imagen de perfil',
-           'password'=>'contraseña',
-           'password_confirmation'=>'confirmar contraseña',
-           'status'=>'estado de cuenta',
+            'last_name' => 'apellidos',
+            'user_name' => 'nombre de usuario',
+            'tel' => 'teléfono',
+            'address' => 'dirección',
+            'sex' => 'sexo',
+            'date_of_birth' => 'fecha de nacimiento',
+            'observation' => 'observaciones',
+            'picture_upload' => 'imagen de perfil',
+            'password' => 'contraseña',
+            'password_confirmation' => 'confirmar contraseña',
+            'status' => 'estado de cuenta',
         ];
         $validator = Validator::make($request->all(), $rules, $messages, $customAttr);
 
         if ($request->ajax()) {
 
             if ($validator->passes()) {
-            $request->merge(['color'=>'#' . substr(md5(mt_rand()), 0, 6)]);
+                $request->merge(['color' => '#' . substr(md5(mt_rand()), 0, 6)]);
 
-            if ($request->has('password'))
-            $request->merge(['password' => bcrypt($request->password)]);
+                if ($request->has('password'))
+                    $request->merge(['password' => bcrypt($request->password)]);
 
-            $employee = Employee::create(array_filter($request->except('password_confirmation', 'user_name', 'picture_upload')));
-            if ($request->hasFile('picture_upload')) {
+                $employee = Employee::create(array_filter($request->except('password_confirmation', 'user_name', 'picture_upload')));
+                if ($request->hasFile('picture_upload')) {
 
-                $ext = $request->file('picture_upload')->extension();
-                $pictureObj =  $request->picture_upload;
+                    $ext = $request->file('picture_upload')->extension();
+                    $pictureObj = $request->picture_upload;
 
-                $pictureName = $employee->id . time() . ".$ext";
-                $pictureObj = Image::make($pictureObj)->encode($ext, 75);
-                $pictureObj->resize(150, 150, function ($constraint) {
-                    $constraint->aspectRatio();
-                });
-                Storage::disk('public')->put("images/profiles/$pictureName", $pictureObj->stream());
-                Employee::findOrFail($employee->id)->update(['picture' =>  $pictureName]);
+                    $pictureName = $employee->id . time() . ".$ext";
+                    $pictureObj = Image::make($pictureObj)->encode($ext, 75);
+                    $pictureObj->resize(150, 150, function ($constraint) {
+                        $constraint->aspectRatio();
+                    });
+                    Storage::disk('public')->put("images/profiles/$pictureName", $pictureObj->stream());
+                    Employee::findOrFail($employee->id)->update(['picture' => $pictureName]);
+                }
+
+                $namespace = 'App\Http\Controllers';
+                $controller = app()->make($namespace . '\Auth\EmployeeForgotPasswordController');
+                $controller->callAction('sendResetLinkEmail', [$request]);
+
+                /*auditoria: start*/
+                Pilates::setAudit("Alta empleado id: $employee->id"); /*auditoria: end*/
+                return response()->json(['response' => true, 'employee' => ['employee_id' => $employee->id, 'employee_name' => "$employee->name $employee->last_name"], 'message' => 'Empleado creado con éxito.<br>Puede proporcionar la contraseña creada para este empleado o el empleado puede restablecer la contraseña en el mail que se le ha enviado.', 'error' => []]);
+            } else {
+                return response()->json(['response' => false, 'employee' => [], 'message' => '', 'error' => $validator->errors()->all()]);
             }
 
-            $namespace = 'App\Http\Controllers';
-            $controller = app()->make($namespace . '\Auth\EmployeeForgotPasswordController');
-            $controller->callAction('sendResetLinkEmail', [$request]);
-
-               /*auditoria: start*/Pilates::setAudit("Alta empleado id: $employee->id"); /*auditoria: end*/
-            return response()->json(['response' => true,'employee'=>['employee_id'=>$employee->id,'employee_name'=>"$employee->name $employee->last_name"],'message'=>'Empleado creado con éxito.<br>Puede proporcionar la contraseña creada para este empleado o el empleado puede restablecer la contraseña en el mail que se le ha enviado.','error' =>[]]);
-            }else{
-                return response()->json(['response' => false,'employee'=>[],'message'=>'','error' => $validator->errors()->all()]);
-            }
-
-        }else {
+        } else {
             abort(404);
         }
     }
 
-    public function storeGroup(Request $request){
+    public function storeGroup(Request $request)
+    {
 
         $rules = [
             'name' => 'required|max:29|unique:group,name',
@@ -169,11 +173,11 @@ class DashboardController extends Controller
             'id_room' => 'required',
             'observation' => 'max:5000'
         ];
-        $messages=[
+        $messages = [
             'id_employee.required' => 'Debe seleccionar un empleado para el grupo.',
             'id_room.required' => 'Debe seleccionar una sala para el grupo.',
         ];
-        $customAttr=[
+        $customAttr = [
             'name' => 'nombre de grupo',
             'level' => 'nivel',
             'observation' => 'observaciones'
@@ -183,37 +187,38 @@ class DashboardController extends Controller
         if ($request->ajax()) {
 
             if ($validator->passes()) {
-                $group=Group::create($request->all());
+                $group = Group::create($request->all());
 
-               /*auditoria: start*/Pilates::setAudit("Alta grupo id: $group->id"); /*auditoria: end*/
-                return response()->json(['response' => true,'group'=>['id'=>$group->id,'name'=>$group->name],'message'=>"Grupo creado y seleccionado con éxito",'error' =>[]]);
-            }else{
-                return response()->json(['response' => false,'message'=>'','error' => $validator->errors()->all()]);
+                /*auditoria: start*/
+                Pilates::setAudit("Alta grupo id: $group->id"); /*auditoria: end*/
+                return response()->json(['response' => true, 'group' => ['id' => $group->id, 'name' => $group->name], 'message' => "Grupo creado y seleccionado con éxito", 'error' => []]);
+            } else {
+                return response()->json(['response' => false, 'message' => '', 'error' => $validator->errors()->all()]);
             }
 
-        }else {
+        } else {
             abort(404);
         }
     }
 
     public function storeGroupSession(Request $request)
     {
-        $daysSelected=(!empty($request->input('serie_days_selected')))?$request->input('serie_days_selected'):[];
+        $daysSelected = (!empty($request->input('serie_days_selected'))) ? $request->input('serie_days_selected') : [];
         $serieDays = [];
 
-        $cantClients=(!empty($request->input('clients_selected')))?count($request->input('clients_selected')):0;
+        $cantClients = (!empty($request->input('clients_selected'))) ? count($request->input('clients_selected')) : 0;
         $rules = [
 
-            'group_selected'  => [
+            'group_selected' => [
                 'requi',
                 'required_with:clients_selected',
                 'required_with:employee_selected',
                 new RuleEmptyGroup($request->group_selected['id_group'], $request->date_start . ' ' . $request->timepicker_start, $request->date_start . ' ' . $request->timepicker_end, $cantClients),
                 new RuleDuplicateGroupSessions($request->group_selected['id_group'], $request->date_start . ' ' . $request->timepicker_start, $request->date_start . ' ' . $request->timepicker_end),
                 new RuleRoomCrash($request->group_selected['id_group'], $request->date_start . ' ' . $request->timepicker_start, $request->date_start . ' ' . $request->timepicker_end),
-                new RuleTemplateHasBeenLoaded($request->date_start . ' ' . $request->timepicker_start, $request->date_start . ' ' . $request->timepicker_end,$request->mode_static)
+                new RuleTemplateHasBeenLoaded($request->date_start . ' ' . $request->timepicker_start, $request->date_start . ' ' . $request->timepicker_end, $request->mode_static)
             ],
-            'date_start'   => ['required', 'date_format:"Y-m-d"', new RuleWorkingDays($request->date_start), new RuleNoWorkDayEvent($request->date_start)],
+            'date_start' => ['required', 'date_format:"Y-m-d"', new RuleWorkingDays($request->date_start), new RuleNoWorkDayEvent($request->date_start)],
             'timepicker_start' => 'required|date_format:"g:i A"',
             'timepicker_end' => 'required|date_format:"g:i A"|after:timepicker_start',
             'observation' => 'nullable|max:250'
@@ -223,7 +228,7 @@ class DashboardController extends Controller
 
 
             if (!empty($request->input('clients_selected'))) {
-                $clients =  $request->input('clients_selected');
+                $clients = $request->input('clients_selected');
                 foreach ($clients as $key => $client) {
                     $rules["clients_selected.$key.id"] = [
                         /*new RuleSufficientBalance(
@@ -231,7 +236,7 @@ class DashboardController extends Controller
                             $client['id'],
                             "$client[name] $client[last_name]"
                         ),*/
-                        new RuleDuplicatesSessionClient($request->group_selected['id_group'], $request->date_start . ' ' . $request->timepicker_start, $request->date_start . ' ' . $request->timepicker_end,  $client['id'], "$client[name] $client[last_name]")
+                        new RuleDuplicatesSessionClient($request->group_selected['id_group'], $request->date_start . ' ' . $request->timepicker_start, $request->date_start . ' ' . $request->timepicker_end, $client['id'], "$client[name] $client[last_name]")
                     ];
                 }
             }
@@ -240,8 +245,8 @@ class DashboardController extends Controller
         if (!empty($request->input('employee_selected'))) {
             $rules['employee_selected'] = [
                 'nullable',
-                new RuleEmployeeSetGroup($request->employee_selected, $request->date_start . ' ' . $request->timepicker_start,$request->date_start . ' ' . $request->timepicker_end,true),
-                new RuleEmployeeDuplicateSessionTime($request->employee_selected, $request->date_start . ' ' . $request->timepicker_start,$request->date_start . ' ' . $request->timepicker_end,$request->group_selected['id_group'])
+                new RuleEmployeeSetGroup($request->employee_selected, $request->date_start . ' ' . $request->timepicker_start, $request->date_start . ' ' . $request->timepicker_end, true),
+                new RuleEmployeeDuplicateSessionTime($request->employee_selected, $request->date_start . ' ' . $request->timepicker_start, $request->date_start . ' ' . $request->timepicker_end, $request->group_selected['id_group'])
             ];
         }
 
@@ -282,8 +287,8 @@ class DashboardController extends Controller
                 $balanceCheck = null;
 
 
-                if(!empty($request->input('serie_days_selected'))){
-                    $daysSelectedItems=['monday','tuesday','wednesday','thursday','friday'];
+                if (!empty($request->input('serie_days_selected'))) {
+                    $daysSelectedItems = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
                     $dateDay = Carbon::createFromFormat('Y-m-d', $request->date_start);
 
                     $year = $dateDay->year;
@@ -293,105 +298,110 @@ class DashboardController extends Controller
 
                     foreach (range(1, $days) as $day) {
                         $date = Carbon::createFromFormat('Y-m-d', "$year-$month-$day");
-                        $dayNoWork=NoWorkDay::where('date', $date->clone()->format('Y-m-d'))->exists();
+                        $dayNoWork = NoWorkDay::where('date', $date->clone()->format('Y-m-d'))->exists();
 
-                        if (!$dayNoWork  && (in_array($daysSelectedItems[0], $daysSelected)) && $date->clone()->isMonday() === true && ($date > $dateDay)) $serieDays[] = (Carbon::createFromFormat('Y-m-d', "$year-$month-$day")->format('Y-m-d'));
-                        if (!$dayNoWork  && (in_array($daysSelectedItems[1], $daysSelected)) && $date->clone()->isTuesday() === true && ($date > $dateDay)) $serieDays[] = (Carbon::createFromFormat('Y-m-d', "$year-$month-$day")->format('Y-m-d'));
-                        if (!$dayNoWork  && (in_array($daysSelectedItems[2], $daysSelected)) && $date->clone()->isWednesday() === true && ($date > $dateDay)) $serieDays[] = (Carbon::createFromFormat('Y-m-d', "$year-$month-$day")->format('Y-m-d'));
-                        if (!$dayNoWork  && (in_array($daysSelectedItems[3], $daysSelected)) && $date->clone()->isThursday() === true && ($date > $dateDay)) $serieDays[] = (Carbon::createFromFormat('Y-m-d', "$year-$month-$day")->format('Y-m-d'));
-                        if (!$dayNoWork  && (in_array($daysSelectedItems[4], $daysSelected)) && $date->clone()->isFriday() === true && ($date > $dateDay)) $serieDays[] = (Carbon::createFromFormat('Y-m-d', "$year-$month-$day")->format('Y-m-d'));
+                        if (!$dayNoWork && (in_array($daysSelectedItems[0], $daysSelected)) && $date->clone()->isMonday() === true && ($date > $dateDay))
+                            $serieDays[] = (Carbon::createFromFormat('Y-m-d', "$year-$month-$day")->format('Y-m-d'));
+                        if (!$dayNoWork && (in_array($daysSelectedItems[1], $daysSelected)) && $date->clone()->isTuesday() === true && ($date > $dateDay))
+                            $serieDays[] = (Carbon::createFromFormat('Y-m-d', "$year-$month-$day")->format('Y-m-d'));
+                        if (!$dayNoWork && (in_array($daysSelectedItems[2], $daysSelected)) && $date->clone()->isWednesday() === true && ($date > $dateDay))
+                            $serieDays[] = (Carbon::createFromFormat('Y-m-d', "$year-$month-$day")->format('Y-m-d'));
+                        if (!$dayNoWork && (in_array($daysSelectedItems[3], $daysSelected)) && $date->clone()->isThursday() === true && ($date > $dateDay))
+                            $serieDays[] = (Carbon::createFromFormat('Y-m-d', "$year-$month-$day")->format('Y-m-d'));
+                        if (!$dayNoWork && (in_array($daysSelectedItems[4], $daysSelected)) && $date->clone()->isFriday() === true && ($date > $dateDay))
+                            $serieDays[] = (Carbon::createFromFormat('Y-m-d', "$year-$month-$day")->format('Y-m-d'));
                     }
 
                 }
 
                 if (!empty($request->input('clients_selected'))) {
-                    $clients =  $request->input('clients_selected');
+                    $clients = $request->input('clients_selected');
 
                     foreach ($clients as $key => $client) {
 
-                    $balanceCheck = Pilates::checkBalance($request->group_selected['id_group'],  $client['id']);
+                        $balanceCheck = Pilates::checkBalance($request->group_selected['id_group'], $client['id']);
 
-                    if($balanceCheck['success'] == true || $client['negative_balance']){
-                    if ($groupRoom->type_room == 'Máquina') {
-                        Session::create([
-                            'id_group' => $request->group_selected['id_group'],
-                            'id_client' => $client['id'] ?? null,
-                            'date_start' => $dateStart,
-                            'date_end' => $dateEnd,
-                            'observation' => $request->observation,
-                            'sessions_machine' => (($balanceCheck['success'] == true && $balanceCheck['error'] == false) || $client['negative_balance']=='true') ? 1 : 0,
-                            'sessions_floor' => (($balanceCheck['success'] == true && $balanceCheck['error'] != false) && $client['negative_balance']=='false') ? 2 : 0,
-                        ]);
-                    } else if ($groupRoom->type_room == 'Suelo') {
-                        Session::create([
-                            'id_group' => $request->group_selected['id_group'],
-                            'id_client' => $client['id'] ?? null,
-                            'date_start' => $dateStart,
-                            'date_end' => $dateEnd,
-                            'observation' => $request->observation,
-                            'sessions_floor' => 1
-                        ]);
-                    } else if ($groupRoom->type_room == 'Camilla') {
-                        Session::create([
-                            'id_group' => $request->group_selected['id_group'],
-                            'id_client' => $client['id'] ?? null,
-                            'date_start' => $dateStart,
-                            'date_end' => $dateEnd,
-                            'observation' => $request->observation,
-                            'sessions_individual' => 1
-                        ]);
+                        if ($balanceCheck['success'] == true || $client['negative_balance']) {
+                            if ($groupRoom->type_room == 'Máquina') {
+                                Session::create([
+                                    'id_group' => $request->group_selected['id_group'],
+                                    'id_client' => $client['id'] ?? null,
+                                    'date_start' => $dateStart,
+                                    'date_end' => $dateEnd,
+                                    'observation' => $request->observation,
+                                    'sessions_machine' => (($balanceCheck['success'] == true && $balanceCheck['error'] == false) || $client['negative_balance'] == 'true') ? 1 : 0,
+                                    'sessions_floor' => (($balanceCheck['success'] == true && $balanceCheck['error'] != false) && $client['negative_balance'] == 'false') ? 2 : 0,
+                                ]);
+                            } else if ($groupRoom->type_room == 'Suelo') {
+                                Session::create([
+                                    'id_group' => $request->group_selected['id_group'],
+                                    'id_client' => $client['id'] ?? null,
+                                    'date_start' => $dateStart,
+                                    'date_end' => $dateEnd,
+                                    'observation' => $request->observation,
+                                    'sessions_floor' => 1
+                                ]);
+                            } else if ($groupRoom->type_room == 'Camilla') {
+                                Session::create([
+                                    'id_group' => $request->group_selected['id_group'],
+                                    'id_client' => $client['id'] ?? null,
+                                    'date_start' => $dateStart,
+                                    'date_end' => $dateEnd,
+                                    'observation' => $request->observation,
+                                    'sessions_individual' => 1
+                                ]);
+                            }
+                        }
+
                     }
-                }
-
-                }
 
 
-                foreach ($serieDays as $key => $serieDay) {
-                $dateStart = $serieDay . ' ' . $request->timepicker_start;
-                $dateEnd = $serieDay . ' ' . $request->timepicker_end;
-                $dateStart = DateTime::createFromFormat('Y-m-d g:i A', $dateStart)->format('Y-m-d H:i:s');
-                $dateEnd = DateTime::createFromFormat('Y-m-d g:i A', $dateEnd)->format('Y-m-d H:i:s');
+                    foreach ($serieDays as $key => $serieDay) {
+                        $dateStart = $serieDay . ' ' . $request->timepicker_start;
+                        $dateEnd = $serieDay . ' ' . $request->timepicker_end;
+                        $dateStart = DateTime::createFromFormat('Y-m-d g:i A', $dateStart)->format('Y-m-d H:i:s');
+                        $dateEnd = DateTime::createFromFormat('Y-m-d g:i A', $dateEnd)->format('Y-m-d H:i:s');
 
-                foreach ($clients as $key => $client) {
+                        foreach ($clients as $key => $client) {
 
-                $balanceCheck = Pilates::checkBalance($request->group_selected['id_group'],  $client['id']);
+                            $balanceCheck = Pilates::checkBalance($request->group_selected['id_group'], $client['id']);
 
-                if($balanceCheck['success'] == true || $client['negative_balance']=='true'){
-                    if ($groupRoom->type_room == 'Máquina') {
-                        Session::create([
-                            'id_group' => $request->group_selected['id_group'],
-                            'id_client' => $client['id'] ?? null,
-                            'date_start' => $dateStart,
-                            'date_end' => $dateEnd,
-                            'observation' => $request->observation,
-                            'sessions_machine' => (($balanceCheck['success'] == true && $balanceCheck['error'] == false) || $client['negative_balance']=='true') ? 1 : 0,
-                            'sessions_floor' => (($balanceCheck['success'] == true && $balanceCheck['error'] != false) && $client['negative_balance']=='false') ? 2 : 0,
-                        ]);
-                    } else if ($groupRoom->type_room == 'Suelo') {
-                        Session::create([
-                            'id_group' => $request->group_selected['id_group'],
-                            'id_client' => $client['id'] ?? null,
-                            'date_start' => $dateStart,
-                            'date_end' => $dateEnd,
-                            'observation' => $request->observation,
-                            'sessions_floor' => 1
-                        ]);
-                    } else if ($groupRoom->type_room == 'Camilla') {
-                        Session::create([
-                            'id_group' => $request->group_selected['id_group'],
-                            'id_client' => $client['id'] ?? null,
-                            'date_start' => $dateStart,
-                            'date_end' => $dateEnd,
-                            'observation' => $request->observation,
-                            'sessions_individual' => 1
-                        ]);
+                            if ($balanceCheck['success'] == true || $client['negative_balance'] == 'true') {
+                                if ($groupRoom->type_room == 'Máquina') {
+                                    Session::create([
+                                        'id_group' => $request->group_selected['id_group'],
+                                        'id_client' => $client['id'] ?? null,
+                                        'date_start' => $dateStart,
+                                        'date_end' => $dateEnd,
+                                        'observation' => $request->observation,
+                                        'sessions_machine' => (($balanceCheck['success'] == true && $balanceCheck['error'] == false) || $client['negative_balance'] == 'true') ? 1 : 0,
+                                        'sessions_floor' => (($balanceCheck['success'] == true && $balanceCheck['error'] != false) && $client['negative_balance'] == 'false') ? 2 : 0,
+                                    ]);
+                                } else if ($groupRoom->type_room == 'Suelo') {
+                                    Session::create([
+                                        'id_group' => $request->group_selected['id_group'],
+                                        'id_client' => $client['id'] ?? null,
+                                        'date_start' => $dateStart,
+                                        'date_end' => $dateEnd,
+                                        'observation' => $request->observation,
+                                        'sessions_floor' => 1
+                                    ]);
+                                } else if ($groupRoom->type_room == 'Camilla') {
+                                    Session::create([
+                                        'id_group' => $request->group_selected['id_group'],
+                                        'id_client' => $client['id'] ?? null,
+                                        'date_start' => $dateStart,
+                                        'date_end' => $dateEnd,
+                                        'observation' => $request->observation,
+                                        'sessions_individual' => 1
+                                    ]);
+                                }
+                            }
+
+                        }
+
+
                     }
-                }
-
-                }
-
-
-                }
 
 
                 } else {
@@ -463,11 +473,12 @@ class DashboardController extends Controller
                 }
 
                 if (!empty($request->input('employee_selected'))) {
-                    Group::where('id',$request->group_selected['id_group'])->update(['id_employee'=>$request->employee_selected]);
+                    Group::where('id', $request->group_selected['id_group'])->update(['id_employee' => $request->employee_selected]);
                 }
 
 
-                /*auditoria: start*/Pilates::setAudit("Creó un grupo de sessiones que inicia $request->date_start $request->timepicker_start y termina $request->date_start $request->timepicker_end"); /*auditoria: end*/
+                /*auditoria: start*/
+                Pilates::setAudit("Creó un grupo de sessiones que inicia $request->date_start $request->timepicker_start y termina $request->date_start $request->timepicker_end"); /*auditoria: end*/
                 return response()->json(['success' => 'El grupo de sesiones se agrego con éxito.', 'error' => false]);
             } else {
                 return response()->json(['success' => false, 'error' => $validator->errors()->all()]);
@@ -493,11 +504,11 @@ class DashboardController extends Controller
         $dateEnd_previous = DateTime::createFromFormat('Y-m-d g:i A', $dateEnd_previous)->format('Y-m-d H:i:s');
 
         $rules = [
-            'date_start'   => ['required', 'date_format:"Y-m-d"', new RuleWorkingDays($request->date_start), new RuleNoWorkDayEvent($request->date_start)],
+            'date_start' => ['required', 'date_format:"Y-m-d"', new RuleWorkingDays($request->date_start), new RuleNoWorkDayEvent($request->date_start)],
             'timepicker_start' => 'required|date_format:"g:i A"',
             'timepicker_end' => 'required|date_format:"g:i A"|after:timepicker_start',
 
-            'date_start_previous'  => 'required|date_format:"Y-m-d"',
+            'date_start_previous' => 'required|date_format:"Y-m-d"',
             'timepicker_start_previous' => 'required|date_format:"g:i A"',
             'timepicker_end_previous' => 'required|date_format:"g:i A"|after:timepicker_start_previous'
         ];
@@ -510,10 +521,10 @@ class DashboardController extends Controller
             $isSame = false;
             $rules['id_group'] = [
                 'required',
-                new RuleEmployeeDuplicateSessionTime2( $request->date_start . ' ' . $request->timepicker_start,$request->date_start . ' ' . $request->timepicker_end,$request->id_group),
+                new RuleEmployeeDuplicateSessionTime2($request->date_start . ' ' . $request->timepicker_start, $request->date_start . ' ' . $request->timepicker_end, $request->id_group),
                 new RuleDuplicateGroupSessions($request->id_group, $request->date_start . ' ' . $request->timepicker_start, $request->date_start . ' ' . $request->timepicker_end),
                 new RuleRoomCrash($request->id_group, $request->date_start . ' ' . $request->timepicker_start, $request->date_start . ' ' . $request->timepicker_end),
-                new RuleDuplicateSessionClientGroup($request->id_group,$dateStart_previous,$dateEnd_previous,$dateStart,$dateEnd )
+                new RuleDuplicateSessionClientGroup($request->id_group, $dateStart_previous, $dateEnd_previous, $dateStart, $dateEnd)
             ];
         }
 
@@ -569,11 +580,11 @@ class DashboardController extends Controller
         $dateEnd_previous = DateTime::createFromFormat('Y-m-d g:i A', $dateEnd_previous)->format('Y-m-d H:i:s');
 
         $rules = [
-            'date_start'   => ['required', 'date_format:"Y-m-d"', new RuleWorkingDays($request->date_start), new RuleNoWorkDayEvent($request->date_start)],
+            'date_start' => ['required', 'date_format:"Y-m-d"', new RuleWorkingDays($request->date_start), new RuleNoWorkDayEvent($request->date_start)],
             'timepicker_start' => 'required|date_format:"g:i A"',
             'timepicker_end' => 'required|date_format:"g:i A"|after:timepicker_start',
 
-            'date_start_previous'  => 'required|date_format:"Y-m-d"',
+            'date_start_previous' => 'required|date_format:"Y-m-d"',
             'timepicker_start_previous' => 'required|date_format:"g:i A"',
             'timepicker_end_previous' => 'required|date_format:"g:i A"|after:timepicker_start_previous'
         ];
@@ -581,8 +592,8 @@ class DashboardController extends Controller
         if (!empty($request->input('employee_selected'))) {
             $rules['employee_selected'] = [
                 'nullable',
-                new RuleEmployeeSetGroup($request->employee_selected, $request->date_start . ' ' . $request->timepicker_start,$request->date_start . ' ' . $request->timepicker_end,true),
-                new RuleEmployeeDuplicateSessionTime($request->employee_selected, $request->date_start . ' ' . $request->timepicker_start,$request->date_start . ' ' . $request->timepicker_end,$request->id_group_previous)
+                new RuleEmployeeSetGroup($request->employee_selected, $request->date_start . ' ' . $request->timepicker_start, $request->date_start . ' ' . $request->timepicker_end, true),
+                new RuleEmployeeDuplicateSessionTime($request->employee_selected, $request->date_start . ' ' . $request->timepicker_start, $request->date_start . ' ' . $request->timepicker_end, $request->id_group_previous)
             ];
         }
 
@@ -596,9 +607,9 @@ class DashboardController extends Controller
                 'required',
                 new RuleDuplicateGroupSessions($request->id_group, $request->date_start . ' ' . $request->timepicker_start, $request->date_start . ' ' . $request->timepicker_end),
                 new RuleRoomCrash($request->id_group_previous, $request->date_start . ' ' . $request->timepicker_start, $request->date_start . ' ' . $request->timepicker_end),
-                new sameTypeRoomGroup($request->id_group_previous,$request->id_group),
-                new RuleSufficientCapacityRoomGroup($request->date_start_previous . ' ' . $request->timepicker_start_previous, $request->date_start_previous . ' ' . $request->timepicker_end_previous,$request->id_group_previous,$request->id_group),
-                new RuleDuplicateSessionClientGroup($request->id_group_previous,$dateStart_previous,$dateEnd_previous,$dateStart,$dateEnd )
+                new sameTypeRoomGroup($request->id_group_previous, $request->id_group),
+                new RuleSufficientCapacityRoomGroup($request->date_start_previous . ' ' . $request->timepicker_start_previous, $request->date_start_previous . ' ' . $request->timepicker_end_previous, $request->id_group_previous, $request->id_group),
+                new RuleDuplicateSessionClientGroup($request->id_group_previous, $dateStart_previous, $dateEnd_previous, $dateStart, $dateEnd)
             ];
         }
 
@@ -629,25 +640,27 @@ class DashboardController extends Controller
 
                 foreach ($sessions as $key => $session) {
 
-                    Session::where('id', $session->id)->update(['date_start' => $dateStart, 'date_end' => $dateEnd,'id_group'=>$request->id_group]);
+                    Session::where('id', $session->id)->update(['date_start' => $dateStart, 'date_end' => $dateEnd, 'id_group' => $request->id_group]);
                 }
             }
 
 
             if (!empty($request->input('employee_selected'))) {
-                Group::where('id',$request->id_group)->update(['id_employee'=>$request->employee_selected]);
+                Group::where('id', $request->id_group)->update(['id_employee' => $request->employee_selected]);
             }
 
 
 
-            /*auditoria: start*/Pilates::setAudit("Actualizó el grupo de sessiones que iniciaba $dateStart_previous y terminaba $dateEnd_previous a $dateStart y $dateEnd"); /*auditoria: end*/
+            /*auditoria: start*/
+            Pilates::setAudit("Actualizó el grupo de sessiones que iniciaba $dateStart_previous y terminaba $dateEnd_previous a $dateStart y $dateEnd"); /*auditoria: end*/
             return response()->json(['success' => 'Actualización realizada correctamente.', 'error' => false]);
         } else {
             return response()->json(['success' => false, 'error' => $validator->errors()->all()]);
         }
     }
 
-    public function setEmployeeGroup(Request $request){
+    public function setEmployeeGroup(Request $request)
+    {
 
         $rules = [
             'id_employee' => 'required',
@@ -658,14 +671,14 @@ class DashboardController extends Controller
 
         if (
             !empty($request->input('id_employee'))
-         && !empty($request->input('date_start'))
-         && !empty($request->input('date_end'))
-         && !empty($request->input('id_group'))
-         ) {
+            && !empty($request->input('date_start'))
+            && !empty($request->input('date_end'))
+            && !empty($request->input('id_group'))
+        ) {
             $rules['id_employee'] = [
                 'nullable',
-                new RuleEmployeeSetGroup($request->id_employee,Carbon::createFromFormat('Y-m-d H:i:s',$request->date_start)->format('Y-m-d g:i A'),Carbon::createFromFormat('Y-m-d H:i:s',$request->date_end)->format('Y-m-d g:i A'),true),
-                new RuleEmployeeDuplicateSessionTimeDrag($request->id_employee, Carbon::createFromFormat('Y-m-d H:i:s',$request->date_start)->format('Y-m-d g:i A'),Carbon::createFromFormat('Y-m-d H:i:s',$request->date_end)->format('Y-m-d g:i A'))
+                new RuleEmployeeSetGroup($request->id_employee, Carbon::createFromFormat('Y-m-d H:i:s', $request->date_start)->format('Y-m-d g:i A'), Carbon::createFromFormat('Y-m-d H:i:s', $request->date_end)->format('Y-m-d g:i A'), true),
+                new RuleEmployeeDuplicateSessionTimeDrag($request->id_employee, Carbon::createFromFormat('Y-m-d H:i:s', $request->date_start)->format('Y-m-d g:i A'), Carbon::createFromFormat('Y-m-d H:i:s', $request->date_end)->format('Y-m-d g:i A'))
             ];
         }
 
@@ -681,39 +694,41 @@ class DashboardController extends Controller
         $validator = Validator::make($request->all(), $rules, $messages, $customAttr);
 
         if ($validator->passes()) {
-        Group::where('id',$request->id_group)->update(['id_employee'=>$request->id_employee]);
+            Group::where('id', $request->id_group)->update(['id_employee' => $request->id_employee]);
 
-        /*auditoria: start*/Pilates::setAudit("Agregó el empleado con id $request->id_employee al grupo $request->id_group"); /*auditoria: end*/
-        return response()->json(['response' => 'Actualización realizada correctamente.', 'status' => true]);
+            /*auditoria: start*/
+            Pilates::setAudit("Agregó el empleado con id $request->id_employee al grupo $request->id_group"); /*auditoria: end*/
+            return response()->json(['response' => 'Actualización realizada correctamente.', 'status' => true]);
         } else {
             return response()->json(['status' => false, 'response' => $validator->errors()->all()]);
         }
     }
 
 
-    public function moveSessions(Request $request){
-        $cantSessions=(!empty($request->input('sessions_selected')))?count($request->input('sessions_selected')):0;
+    public function moveSessions(Request $request)
+    {
+        $cantSessions = (!empty($request->input('sessions_selected'))) ? count($request->input('sessions_selected')) : 0;
         $dateStart = $request->date_start . ' ' . $request->timepicker_start;
         $dateEnd = $request->date_start . ' ' . $request->timepicker_end;
         $rules = [
 
-            'id_group'  => [
+            'id_group' => [
                 'required',
                 'required_with:sessions_selected',
-                 new RuleEmptyGroup($request->id_group, $request->date_start . ' ' . $request->timepicker_start, $request->date_start . ' ' . $request->timepicker_end,$cantSessions),
+                new RuleEmptyGroup($request->id_group, $request->date_start . ' ' . $request->timepicker_start, $request->date_start . ' ' . $request->timepicker_end, $cantSessions),
 
             ],
             'sessions_selected' => [
                 'required',
-                new RuleSessionSameType($request->id_group,$request->input('sessions_selected')[0])
+                new RuleSessionSameType($request->id_group, $request->input('sessions_selected')[0])
             ]
         ];
 
         if (!empty($request->input('sessions_selected'))) {
-            $sessionsSelected =  $request->input('sessions_selected');
+            $sessionsSelected = $request->input('sessions_selected');
             foreach ($sessionsSelected as $key => $sessionSelected) {
                 $rules["sessions_selected.$key"] = [
-                    new RuleDuplicateSessionSameGroup($request->id_group,$dateStart,$dateEnd,$sessionSelected )
+                    new RuleDuplicateSessionSameGroup($request->id_group, $dateStart, $dateEnd, $sessionSelected)
                 ];
             }
         }
@@ -729,28 +744,29 @@ class DashboardController extends Controller
 
 
 
-            $dateStart = DateTime::createFromFormat('Y-m-d g:i A', $dateStart)->format('Y-m-d H:i:s');
-            $dateEnd = DateTime::createFromFormat('Y-m-d g:i A', $dateEnd)->format('Y-m-d H:i:s');
+                $dateStart = DateTime::createFromFormat('Y-m-d g:i A', $dateStart)->format('Y-m-d H:i:s');
+                $dateEnd = DateTime::createFromFormat('Y-m-d g:i A', $dateEnd)->format('Y-m-d H:i:s');
 
-            $sessions =  $request->input('sessions_selected');
+                $sessions = $request->input('sessions_selected');
 
-            if(count($sessions)>0){
-                $tmpSession=  Session::where('id',$sessions[0])->first();
-                Session::create([
-                    'id_group' => $tmpSession->id_group,
-                    'id_client' => null,
-                    'date_start' => $tmpSession->date_start,
-                    'date_end' => $tmpSession->date_end,
-                    'observation' => $tmpSession->observation
-                ]);
-               }
+                if (count($sessions) > 0) {
+                    $tmpSession = Session::where('id', $sessions[0])->first();
+                    Session::create([
+                        'id_group' => $tmpSession->id_group,
+                        'id_client' => null,
+                        'date_start' => $tmpSession->date_start,
+                        'date_end' => $tmpSession->date_end,
+                        'observation' => $tmpSession->observation
+                    ]);
+                }
 
-            foreach ($sessions as $key => $session) {
-            Session::where('id',$session)->update(['date_start'=>$dateStart,'date_end'=>$dateEnd,'id_group'=>$request->id_group]);
-            }
-            $countSession=count($sessions);
-             /*auditoria: start*/Pilates::setAudit("Movió $countSession sesion(s)"); /*auditoria: end*/
-                return response()->json(['response' => ($countSession>1)?"$countSession sesiones movidas con éxito.":"$countSession sesión movida con éxito.", 'status' => true]);
+                foreach ($sessions as $key => $session) {
+                    Session::where('id', $session)->update(['date_start' => $dateStart, 'date_end' => $dateEnd, 'id_group' => $request->id_group]);
+                }
+                $countSession = count($sessions);
+                /*auditoria: start*/
+                Pilates::setAudit("Movió $countSession sesion(s)"); /*auditoria: end*/
+                return response()->json(['response' => ($countSession > 1) ? "$countSession sesiones movidas con éxito." : "$countSession sesión movida con éxito.", 'status' => true]);
             } else {
                 return response()->json(['response' => $validator->errors()->all(), 'status' => false]);
             }
@@ -761,29 +777,30 @@ class DashboardController extends Controller
 
     }
 
-    public function moveSessions2(Request $request){
-        $cantSessions=(!empty($request->input('sessions_selected')))?count($request->input('sessions_selected')):0;
+    public function moveSessions2(Request $request)
+    {
+        $cantSessions = (!empty($request->input('sessions_selected'))) ? count($request->input('sessions_selected')) : 0;
         $dateStart = DateTime::createFromFormat('Y-m-d H:i:s', $request->date_start)->format('Y-m-d g:i A');
-        $dateEnd =DateTime::createFromFormat('Y-m-d H:i:s', $request->date_end)->format('Y-m-d g:i A');
+        $dateEnd = DateTime::createFromFormat('Y-m-d H:i:s', $request->date_end)->format('Y-m-d g:i A');
         $rules = [
 
-            'id_group'  => [
+            'id_group' => [
                 'required',
                 'required_with:sessions_selected',
-                 new RuleEmptyGroup($request->id_group, $dateStart, $dateEnd,$cantSessions),
+                new RuleEmptyGroup($request->id_group, $dateStart, $dateEnd, $cantSessions),
 
             ],
             'sessions_selected' => [
                 'required',
-                new RuleSessionSameType($request->id_group,$request->input('sessions_selected')[0])
+                new RuleSessionSameType($request->id_group, $request->input('sessions_selected')[0])
             ]
         ];
 
         if (!empty($request->input('sessions_selected'))) {
-            $sessionsSelected =  $request->input('sessions_selected');
+            $sessionsSelected = $request->input('sessions_selected');
             foreach ($sessionsSelected as $key => $sessionSelected) {
                 $rules["sessions_selected.$key"] = [
-                    new RuleDuplicateSessionSameGroup($request->id_group,$dateStart,$dateEnd,$sessionSelected )
+                    new RuleDuplicateSessionSameGroup($request->id_group, $dateStart, $dateEnd, $sessionSelected)
                 ];
             }
         }
@@ -799,28 +816,29 @@ class DashboardController extends Controller
 
 
 
-            $dateStart = DateTime::createFromFormat('Y-m-d g:i A', $dateStart)->format('Y-m-d H:i:s');
-            $dateEnd = DateTime::createFromFormat('Y-m-d g:i A', $dateEnd)->format('Y-m-d H:i:s');
+                $dateStart = DateTime::createFromFormat('Y-m-d g:i A', $dateStart)->format('Y-m-d H:i:s');
+                $dateEnd = DateTime::createFromFormat('Y-m-d g:i A', $dateEnd)->format('Y-m-d H:i:s');
 
-            $sessions =  $request->input('sessions_selected');
+                $sessions = $request->input('sessions_selected');
 
-            if(count($sessions)>0){
-                $tmpSession=  Session::where('id',$sessions[0])->first();
-                Session::create([
-                    'id_group' => $tmpSession->id_group,
-                    'id_client' => null,
-                    'date_start' => $tmpSession->date_start,
-                    'date_end' => $tmpSession->date_end,
-                    'observation' => $tmpSession->observation
-                ]);
-               }
+                if (count($sessions) > 0) {
+                    $tmpSession = Session::where('id', $sessions[0])->first();
+                    Session::create([
+                        'id_group' => $tmpSession->id_group,
+                        'id_client' => null,
+                        'date_start' => $tmpSession->date_start,
+                        'date_end' => $tmpSession->date_end,
+                        'observation' => $tmpSession->observation
+                    ]);
+                }
 
-            foreach ($sessions as $key => $session) {
-            Session::where('id',$session)->update(['date_start'=>$dateStart,'date_end'=>$dateEnd,'id_group'=>$request->id_group]);
-            }
-            $countSession=count($sessions);
-             /*auditoria: start*/Pilates::setAudit("Movió sesiones ids: ".implode(', ', $sessions)); /*auditoria: end*/
-                return response()->json(['response' => ($countSession>1)?"$countSession sesiones movidas con éxito.":"$countSession sesión movida con éxito.", 'status' => true]);
+                foreach ($sessions as $key => $session) {
+                    Session::where('id', $session)->update(['date_start' => $dateStart, 'date_end' => $dateEnd, 'id_group' => $request->id_group]);
+                }
+                $countSession = count($sessions);
+                /*auditoria: start*/
+                Pilates::setAudit("Movió sesiones ids: " . implode(', ', $sessions)); /*auditoria: end*/
+                return response()->json(['response' => ($countSession > 1) ? "$countSession sesiones movidas con éxito." : "$countSession sesión movida con éxito.", 'status' => true]);
             } else {
                 return response()->json(['response' => $validator->errors()->all(), 'status' => false]);
             }
@@ -835,16 +853,16 @@ class DashboardController extends Controller
 
     public function storeNewSession(Request $request)
     {
-        $cantClients=(!empty($request->input('clients_selected')))?count($request->input('clients_selected')):0;
+        $cantClients = (!empty($request->input('clients_selected'))) ? count($request->input('clients_selected')) : 0;
 
         $rules = [
 
-            'group_selected'  => [
+            'group_selected' => [
                 'required',
                 'required_with:clients_selected',
-                 new RuleEmptyGroup($request->group_selected['id_group'], $request->date_start . ' ' . $request->timepicker_start, $request->date_start . ' ' . $request->timepicker_end,$cantClients)
+                new RuleEmptyGroup($request->group_selected['id_group'], $request->date_start . ' ' . $request->timepicker_start, $request->date_start . ' ' . $request->timepicker_end, $cantClients)
             ],
-            'date_start'   => ['required', 'date_format:"Y-m-d"', new RuleWorkingDays($request->date_start), new RuleNoWorkDayEvent($request->date_start)],
+            'date_start' => ['required', 'date_format:"Y-m-d"', new RuleWorkingDays($request->date_start), new RuleNoWorkDayEvent($request->date_start)],
             'timepicker_start' => 'required|date_format:"g:i A"',
             'timepicker_end' => 'required|date_format:"g:i A"|after:timepicker_start',
             'observation' => 'nullable|max:250',
@@ -853,15 +871,15 @@ class DashboardController extends Controller
 
         if (!empty($request->input('group_selected'))) {
             if (!empty($request->input('clients_selected'))) {
-                $clients =  $request->input('clients_selected');
+                $clients = $request->input('clients_selected');
                 foreach ($clients as $key => $client) {
                     $rules["clients_selected.$key.id"] = [
-                       /* new RuleSufficientBalance(
-                            $request->group_selected['id_group'],
-                            $client['id'],
-                            "$client[name] $client[last_name]"
-                        ),*/
-                        new RuleDuplicatesSessionClient($request->group_selected['id_group'], $request->date_start . ' ' . $request->timepicker_start, $request->date_start . ' ' . $request->timepicker_end,  $client['id'], "$client[name] $client[last_name]")
+                        /* new RuleSufficientBalance(
+                             $request->group_selected['id_group'],
+                             $client['id'],
+                             "$client[name] $client[last_name]"
+                         ),*/
+                        new RuleDuplicatesSessionClient($request->group_selected['id_group'], $request->date_start . ' ' . $request->timepicker_start, $request->date_start . ' ' . $request->timepicker_end, $client['id'], "$client[name] $client[last_name]")
                     ];
                 }
             }
@@ -900,46 +918,47 @@ class DashboardController extends Controller
                 $dateStart = DateTime::createFromFormat('Y-m-d g:i A', $dateStart)->format('Y-m-d H:i:s');
                 $dateEnd = DateTime::createFromFormat('Y-m-d g:i A', $dateEnd)->format('Y-m-d H:i:s');
 
-                $clients =  $request->input('clients_selected');
+                $clients = $request->input('clients_selected');
 
                 foreach ($clients as $key => $client) {
 
-                $balanceCheck = Pilates::checkBalance($request->group_selected['id_group'], $client['id']);
+                    $balanceCheck = Pilates::checkBalance($request->group_selected['id_group'], $client['id']);
 
-                if ($groupRoom->type_room == 'Máquina') {
-                    Session::create([
-                        'id_group' => $request->group_selected['id_group'],
-                        'id_client' => $client['id'] ?? null,
-                        'date_start' => $dateStart,
-                        'date_end' => $dateEnd,
-                        'observation' => $request->observation,
-                        'sessions_machine' => (($balanceCheck['success'] == true && $balanceCheck['error'] == false) || $client['negative_balance']=='true') ? 1 : 0,
-                        'sessions_floor' => (($balanceCheck['success'] == true && $balanceCheck['error'] != false) && $client['negative_balance']=='false') ? 2 : 0,
-                    ]);
-                } else if ($groupRoom->type_room == 'Suelo') {
-                    Session::create([
-                        'id_group' => $request->group_selected['id_group'],
-                        'id_client' => $client['id'] ?? null,
-                        'date_start' => $dateStart,
-                        'date_end' => $dateEnd,
-                        'observation' => $request->observation,
-                        'sessions_floor' => 1
-                    ]);
-                } else if ($groupRoom->type_room == 'Camilla') {
-                    Session::create([
-                        'id_group' => $request->group_selected['id_group'],
-                        'id_client' => $client['id'] ?? null,
-                        'date_start' => $dateStart,
-                        'date_end' => $dateEnd,
-                        'observation' => $request->observation,
-                        'sessions_individual' => 1
-                    ]);
+                    if ($groupRoom->type_room == 'Máquina') {
+                        Session::create([
+                            'id_group' => $request->group_selected['id_group'],
+                            'id_client' => $client['id'] ?? null,
+                            'date_start' => $dateStart,
+                            'date_end' => $dateEnd,
+                            'observation' => $request->observation,
+                            'sessions_machine' => (($balanceCheck['success'] == true && $balanceCheck['error'] == false) || $client['negative_balance'] == 'true') ? 1 : 0,
+                            'sessions_floor' => (($balanceCheck['success'] == true && $balanceCheck['error'] != false) && $client['negative_balance'] == 'false') ? 2 : 0,
+                        ]);
+                    } else if ($groupRoom->type_room == 'Suelo') {
+                        Session::create([
+                            'id_group' => $request->group_selected['id_group'],
+                            'id_client' => $client['id'] ?? null,
+                            'date_start' => $dateStart,
+                            'date_end' => $dateEnd,
+                            'observation' => $request->observation,
+                            'sessions_floor' => 1
+                        ]);
+                    } else if ($groupRoom->type_room == 'Camilla') {
+                        Session::create([
+                            'id_group' => $request->group_selected['id_group'],
+                            'id_client' => $client['id'] ?? null,
+                            'date_start' => $dateStart,
+                            'date_end' => $dateEnd,
+                            'observation' => $request->observation,
+                            'sessions_individual' => 1
+                        ]);
+                    }
                 }
-            }
-            $countClients=count($clients);
-            $groupTmpAudit=$request->group_selected['id_group'];
-             /*auditoria: start*/Pilates::setAudit("Agregó $countClients sesion(s) de cliente al horario de inicio:$dateStart y termino:$dateEnd en el grupo con id  $groupTmpAudit"); /*auditoria: end*/
-                return response()->json(['success' => ($countClients>1)?"$countClients sesiones de cliente agregadas con éxito.":"$countClients sesión de cliente agregada con éxito.", 'error' => false]);
+                $countClients = count($clients);
+                $groupTmpAudit = $request->group_selected['id_group'];
+                /*auditoria: start*/
+                Pilates::setAudit("Agregó $countClients sesion(s) de cliente al horario de inicio:$dateStart y termino:$dateEnd en el grupo con id  $groupTmpAudit"); /*auditoria: end*/
+                return response()->json(['success' => ($countClients > 1) ? "$countClients sesiones de cliente agregadas con éxito." : "$countClients sesión de cliente agregada con éxito.", 'error' => false]);
             } else {
                 return response()->json(['success' => false, 'error' => $validator->errors()->all()]);
             }
@@ -952,13 +971,13 @@ class DashboardController extends Controller
     {
 
 
-    $groupsExists=[];
-    $roomsExists=[];
-    $template_json=Template::where('status','true')->first();
-    if (isset($template_json)) {
-      $defaultTimes = json_decode($template_json->default_time);
-    }else {
-      $defaultTimes= json_decode('[
+        $groupsExists = [];
+        $roomsExists = [];
+        $template_json = Template::where('status', 'true')->first();
+        if (isset($template_json)) {
+            $defaultTimes = json_decode($template_json->default_time);
+        } else {
+            $defaultTimes = json_decode('[
           {"start":"08:05:00","end":"09:00:00","start_formated":"8:05 AM","end_formated":"9:00 AM"},
           {"start":"09:05:00","end":"10:00:00","start_formated":"9:05 AM","end_formated":"10:00 AM"},
           {"start":"10:05:00","end":"11:00:00","start_formated":"10:05 AM","end_formated":"11:00 AM"},
@@ -974,21 +993,21 @@ class DashboardController extends Controller
           {"start":"20:05:00","end":"21:00:00","start_formated":"8:05 PM","end_formated":"9:00 PM"},
           {"start":"21:05:00","end":"22:00:00","start_formated":"9:05 PM","end_formated":"10:00 PM"}
       ]');
-    }
+        }
         $start_date = $request->start_date;
         $end_date = $request->end_date;
         $tabTypeData = $request->tab_type_data;
 
-       $locks=LockAdd::where('date_start', '>=', $start_date)->where('date_end', '<=', $end_date)->get();
+        $locks = LockAdd::where('date_start', '>=', $start_date)->where('date_end', '<=', $end_date)->get();
 
         $sessions = [];
 
         $sessions = Session::
-             where('date_start', '>=', $start_date)
+            where('date_start', '>=', $start_date)
             ->where('date_end', '<=', $end_date)
-            ->groupBy('date_start','date_end','id_group')
+            ->groupBy('date_start', 'date_end', 'id_group')
             ->orderBy('id_group', 'asc')
-            ->get(['id','id_group','id_client','date_start','date_end','sessions_machine','sessions_floor','sessions_individual','status']);
+            ->get(['id', 'id_group', 'id_client', 'date_start', 'date_end', 'sessions_machine', 'sessions_floor', 'sessions_individual', 'status']);
 
 
 
@@ -996,82 +1015,82 @@ class DashboardController extends Controller
         $groupsSession = [];
         $array_hours_exist = [];
 
-        foreach ($sessions as $key =>   $session) {
-                   $groupTmp1=[];
+        foreach ($sessions as $key => $session) {
+            $groupTmp1 = [];
 
-                    $employeeGroupData=[];
-                    $flagExist=false;
-                    foreach ($groupsExists as $key => $group) {
-                        if($session->id_group==$group['id_group']){
-                            $flagExist=true;
-                            $employeeGroupData=$group;
-                        }
-                    }
-
-                    if(!$flagExist){
-                        $employeeGroupData = Group::where('group.id', $session->id_group)
-                        ->leftJoin('employee', 'employee.id', '=', 'group.id_employee')
-                        ->get([
-                            'group.id as id_group',
-                            'group.name as name_group',
-                            'group.level as level_group',
-                            'group.id_room as group_room',
-                            'group.observation as observations_group',
-                            'employee.id  as id_employee',
-                            'employee.name as name_employee',
-                            'employee.last_name as last_name_employee'
-                        ])->first();
-                        array_push($groupsExists, $employeeGroupData);
-                    }
-
-                        // ROOM GROUP
-                $flagExistRoom=false;
-                $roomTmp=[];
-                foreach ($roomsExists as $key => $room) {
-                    if($room->id==$employeeGroupData['group_room']){
-                        $flagExistRoom=true;
-                        $roomTmp=$room;
-                    }
+            $employeeGroupData = [];
+            $flagExist = false;
+            foreach ($groupsExists as $key => $group) {
+                if ($session->id_group == $group['id_group']) {
+                    $flagExist = true;
+                    $employeeGroupData = $group;
                 }
-                if(!$flagExistRoom){
-                    $roomTmp = Room::where('id', $employeeGroupData['group_room'])->first();
-                    array_push($roomsExists, $roomTmp);
+            }
+
+            if (!$flagExist) {
+                $employeeGroupData = Group::where('group.id', $session->id_group)
+                    ->leftJoin('employee', 'employee.id', '=', 'group.id_employee')
+                    ->get([
+                        'group.id as id_group',
+                        'group.name as name_group',
+                        'group.level as level_group',
+                        'group.id_room as group_room',
+                        'group.observation as observations_group',
+                        'employee.id  as id_employee',
+                        'employee.name as name_employee',
+                        'employee.last_name as last_name_employee'
+                    ])->first();
+                array_push($groupsExists, $employeeGroupData);
+            }
+
+            // ROOM GROUP
+            $flagExistRoom = false;
+            $roomTmp = [];
+            foreach ($roomsExists as $key => $room) {
+                if ($room->id == $employeeGroupData['group_room']) {
+                    $flagExistRoom = true;
+                    $roomTmp = $room;
                 }
+            }
+            if (!$flagExistRoom) {
+                $roomTmp = Room::where('id', $employeeGroupData['group_room'])->first();
+                array_push($roomsExists, $roomTmp);
+            }
 
-                $flagAdd=false;
-                if(($roomTmp->type_room=='Máquina' || $roomTmp->type_room=='Suelo') && $tabTypeData=='pilates'){
-                    $flagAdd=true;
-                }else if($roomTmp->type_room == 'Camilla' && $tabTypeData=='physiotherapy'){
-                    $flagAdd=true;
-                }else if($tabTypeData=='all'){
-                    $flagAdd=true;
-                }
+            $flagAdd = false;
+            if (($roomTmp->type_room == 'Máquina' || $roomTmp->type_room == 'Suelo') && $tabTypeData == 'pilates') {
+                $flagAdd = true;
+            } else if ($roomTmp->type_room == 'Camilla' && $tabTypeData == 'physiotherapy') {
+                $flagAdd = true;
+            } else if ($tabTypeData == 'all') {
+                $flagAdd = true;
+            }
 
-                if($flagAdd){
+            if ($flagAdd) {
 
-                    $groupTmp1['id']= $employeeGroupData['id_group'];
-                    $groupTmp1['id_num']= $employeeGroupData['id_group'];
-                    $groupTmp1['id_group']= $employeeGroupData['id_group'];
-                    $groupTmp1['name']= $employeeGroupData['name_group'];
-                    $groupTmp1['level']= $employeeGroupData['level_group'];
+                $groupTmp1['id'] = $employeeGroupData['id_group'];
+                $groupTmp1['id_num'] = $employeeGroupData['id_group'];
+                $groupTmp1['id_group'] = $employeeGroupData['id_group'];
+                $groupTmp1['name'] = $employeeGroupData['name_group'];
+                $groupTmp1['level'] = $employeeGroupData['level_group'];
 
-                    //employee
-                    $groupTmp1['name_employee']= $employeeGroupData['name_employee'];
-                    $groupTmp1['last_name_employee']= $employeeGroupData['last_name_employee'];
-                    //end employee
-                    $groupTmp1['observation']=$employeeGroupData['observations_group'];
-                    $groupTmp1['actions']= $employeeGroupData['id_group'];
-                    //room
-                    $groupTmp1['room_id']= $roomTmp->id;
-                    $groupTmp1['room_name']= $roomTmp->name;
-                    $groupTmp1['type_room']= $roomTmp->type_room;
-                    //sessions
-                    $groupTmp1['date_start']=  $session->date_start;
-                    $groupTmp1['date_end']=  $session->date_end;
+                //employee
+                $groupTmp1['name_employee'] = $employeeGroupData['name_employee'];
+                $groupTmp1['last_name_employee'] = $employeeGroupData['last_name_employee'];
+                //end employee
+                $groupTmp1['observation'] = $employeeGroupData['observations_group'];
+                $groupTmp1['actions'] = $employeeGroupData['id_group'];
+                //room
+                $groupTmp1['room_id'] = $roomTmp->id;
+                $groupTmp1['room_name'] = $roomTmp->name;
+                $groupTmp1['type_room'] = $roomTmp->type_room;
+                //sessions
+                $groupTmp1['date_start'] = $session->date_start;
+                $groupTmp1['date_end'] = $session->date_end;
 
-                    $status = Pilates::getRealStatusGroupByNumFormatCalendar($employeeGroupData['id_group'],$roomTmp,$session->date_start, $session->date_end);
-                    $groupTmp1['status'] = $status['num'];
-                    $groupTmp1['status_format'] = $status['format'];
+                $status = Pilates::getRealStatusGroupByNumFormatCalendar($employeeGroupData['id_group'], $roomTmp, $session->date_start, $session->date_end);
+                $groupTmp1['status'] = $status['num'];
+                $groupTmp1['status_format'] = $status['format'];
 
 
                 array_push($groupsSession, [
@@ -1084,47 +1103,51 @@ class DashboardController extends Controller
                     'time_end_for_short' => DateTime::createFromFormat('Y-m-d H:i:s', $session->date_end)->format('H:i:s'),
                     'date_start' => DateTime::createFromFormat('Y-m-d H:i:s', $session->date_start)->format('Y-m-d'),
                     'timepicker_start' => DateTime::createFromFormat('Y-m-d H:i:s', $session->date_start)->format('g:i A'),
-                    'timepicker_end' => DateTime::createFromFormat('Y-m-d H:i:s',$session->date_end )->format('g:i A'),
-                    'is_default' =>false,
-                    'locks'=>$locks,
-                    'status_employee'=> ($employeeGroupData['id_employee']!=null)? Pilates::getStatusEmployeeGroupBySessionGroup($employeeGroupData['id_employee'],$session->date_start,$session->date_end,false):false
+                    'timepicker_end' => DateTime::createFromFormat('Y-m-d H:i:s', $session->date_end)->format('g:i A'),
+                    'is_default' => false,
+                    'locks' => $locks,
+                    'status_employee' => ($employeeGroupData['id_employee'] != null) ? Pilates::getStatusEmployeeGroupBySessionGroup($employeeGroupData['id_employee'], $session->date_start, $session->date_end, false) : false
                 ]);
                 array_push($array_hours_exist, [
-                  'timepicker_start' => DateTime::createFromFormat('Y-m-d H:i:s', $session->date_start)->format('h:i A'),
-                  'timepicker_end' => DateTime::createFromFormat('Y-m-d H:i:s',$session->date_end )->format('h:i A')
+                    'timepicker_start' => DateTime::createFromFormat('Y-m-d H:i:s', $session->date_start)->format('h:i A'),
+                    'timepicker_end' => DateTime::createFromFormat('Y-m-d H:i:s', $session->date_end)->format('h:i A')
                 ]);
-                }
+            }
         }
 
         $a = [];
         foreach ($defaultTimes as $key => $defaultTime) {
-            $flagExist=false;
+            $flagExist = false;
             $flagHourExist = false;
 
-            $startDefault=$defaultTime->start;
-            $endDefault=$defaultTime->end;
+            $startDefault = $defaultTime->start;
+            $endDefault = $defaultTime->end;
             foreach ($groupsSession as $key => $groupSession) {
-            if($defaultTime->start_formated==$groupSession['timepicker_start'] && $defaultTime->end_formated==$groupSession['timepicker_end'])$flagExist=true;
+                if ($defaultTime->start_formated == $groupSession['timepicker_start'] && $defaultTime->end_formated == $groupSession['timepicker_end'])
+                    $flagExist = true;
             }
             foreach ($array_hours_exist as $key_ahe => $value_ahe) {
-              // $a[] = [$defaultTime->start_formated,$value_ahe['timepicker_start'],$defaultTime->end_formated,$value_ahe['timepicker_end']];
-              if ($defaultTime->start_formated == $value_ahe['timepicker_start']
-              && $defaultTime->end_formated == $value_ahe['timepicker_end']){
-                  $flagHourExist=true;
-              //   $a [] = [$value_ahe];
-              }
+                // $a[] = [$defaultTime->start_formated,$value_ahe['timepicker_start'],$defaultTime->end_formated,$value_ahe['timepicker_end']];
+                if (
+                    $defaultTime->start_formated == $value_ahe['timepicker_start']
+                    && $defaultTime->end_formated == $value_ahe['timepicker_end']
+                ) {
+                    $flagHourExist = true;
+                    //   $a [] = [$value_ahe];
+                }
             }
-            if (!$flagHourExist){
-              if(!$flagExist)array_push($groupsSession, [
-                'time_start' => "2015-01-14 $startDefault",
-                'time_end' => "2015-01-14 $endDefault",
-                'time_end_for_short' => $endDefault,
-                'date_start' => "2015-01-14",
-                'timepicker_start' =>$defaultTime->start_formated,
-                'timepicker_end' => $defaultTime->end_formated,
-                'locks'=>$locks,
-                'is_default' =>true
-              ]);
+            if (!$flagHourExist) {
+                if (!$flagExist)
+                    array_push($groupsSession, [
+                        'time_start' => "2015-01-14 $startDefault",
+                        'time_end' => "2015-01-14 $endDefault",
+                        'time_end_for_short' => $endDefault,
+                        'date_start' => "2015-01-14",
+                        'timepicker_start' => $defaultTime->start_formated,
+                        'timepicker_end' => $defaultTime->end_formated,
+                        'locks' => $locks,
+                        'is_default' => true
+                    ]);
             }
         }
 
@@ -1156,11 +1179,15 @@ class DashboardController extends Controller
             }
         }
 
-        $response = ['status' => true, 'response' => ($cantSuccsess <= 1) ?
-            $cantSuccsess . ' sesión eliminada con éxito' :
-            $cantSuccsess . ' sesiones eliminadas con éxito'];
+        $response = [
+            'status' => true,
+            'response' => ($cantSuccsess <= 1) ?
+                $cantSuccsess . ' sesión eliminada con éxito' :
+                $cantSuccsess . ' sesiones eliminadas con éxito'
+        ];
 
-        /*auditoria: start*/Pilates::setAudit("Baja sesión ids: ".implode(', ', $idsSession)); /*auditoria: end*/
+        /*auditoria: start*/
+        Pilates::setAudit("Baja sesión ids: " . implode(', ', $idsSession)); /*auditoria: end*/
         return response()->json($response);
     }
 
@@ -1174,21 +1201,24 @@ class DashboardController extends Controller
         $dateEnd = DateTime::createFromFormat('Y-m-d g:i A', $dateEnd)->format('Y-m-d H:i:s');
 
         $status = false;
-        if (Session::where('id_group', $request->id_group)
-            ->where('date_start', '=', $dateStart)
-            ->where('date_end', '=', $dateEnd)
-            ->delete()
+        if (
+            Session::where('id_group', $request->id_group)
+                ->where('date_start', '=', $dateStart)
+                ->where('date_end', '=', $dateEnd)
+                ->delete()
         ) {
             $status = true;
         }
 
-        /*auditoria: start*/Pilates::setAudit("Eliminó un grupo de sesiones con horario de  inicio:$dateStart y termino:$dateEnd y grupo con id $request->id_group"); /*auditoria: end*/
+        /*auditoria: start*/
+        Pilates::setAudit("Eliminó un grupo de sesiones con horario de  inicio:$dateStart y termino:$dateEnd y grupo con id $request->id_group"); /*auditoria: end*/
         $response = ['status' => $status, 'response' => ($status) ? 'Grupo de sesiones eliminado con éxito' : 'El grupo no pudo ser eliminado con éxito, intente de nuevo.'];
 
         return response()->json($response);
     }
 
-    function lockGroupSessionAdd(Request $request){
+    function lockGroupSessionAdd(Request $request)
+    {
 
         $dateStart = $request->date_start . ' ' . $request->timepicker_start;
         $dateEnd = $request->date_start . ' ' . $request->timepicker_end;
@@ -1196,13 +1226,15 @@ class DashboardController extends Controller
         $dateStart = DateTime::createFromFormat('Y-m-d g:i A', $dateStart)->format('Y-m-d H:i:s');
         $dateEnd = DateTime::createFromFormat('Y-m-d g:i A', $dateEnd)->format('Y-m-d H:i:s');
 
-        if($request->status=="true"){
-            LockAdd::create(['date_start'=>$dateStart,'date_end'=>$dateEnd]);
-             /*auditoria: start*/Pilates::setAudit("Bloqueo de sesiones para el horario de inicio:$dateStart y termino:$dateEnd "); /*auditoria: end*/
+        if ($request->status == "true") {
+            LockAdd::create(['date_start' => $dateStart, 'date_end' => $dateEnd]);
+            /*auditoria: start*/
+            Pilates::setAudit("Bloqueo de sesiones para el horario de inicio:$dateStart y termino:$dateEnd "); /*auditoria: end*/
             return response()->json(['response' => "Bloqueada correctamente.", 'status' => true]);
-        }else {
-            LockAdd::where('date_start',$dateStart)->where('date_end',$dateEnd)->delete();
-              /*auditoria: start*/Pilates::setAudit("Desbloqueo de sesiones para el horario de inicio:$dateStart y termino:$dateEnd "); /*auditoria: end*/
+        } else {
+            LockAdd::where('date_start', $dateStart)->where('date_end', $dateEnd)->delete();
+            /*auditoria: start*/
+            Pilates::setAudit("Desbloqueo de sesiones para el horario de inicio:$dateStart y termino:$dateEnd "); /*auditoria: end*/
             return response()->json(['response' => "Desbloqueada correctamente.", 'status' => true]);
         }
 
@@ -1238,17 +1270,17 @@ class DashboardController extends Controller
         return csrf_token();
     }
 
-    public function  loadTemplate(Request $request)
+    public function loadTemplate(Request $request)
     {
-        $enableStartToday=false;
+        $enableStartToday = false;
 
 
         $rules = [
-            "start_date"=>[new RuleTemplateActive()]
+            "start_date" => [new RuleTemplateActive()]
         ];
-        $messages=[
+        $messages = [
         ];
-        $customAttr=[
+        $customAttr = [
         ];
         $validator = Validator::make($request->all(), $rules, $messages, $customAttr);
 
@@ -1258,134 +1290,135 @@ class DashboardController extends Controller
                 $start_date = $request->start_date;
                 $end_date = $request->end_date;
                 $mode_static = $request->mode_static;
-                $month_selected=$request->month;
+                $month_selected = $request->month;
 
-            $template=Template::where('status','true')->first();
-            $sessionsTemplate= SessionTemplate::where('id_template',$template->id)->get();
-
-
-            $dateDay = Carbon::createFromFormat('Y-m-d H:i:s', $start_date);
-
-            $year = $dateDay->year;
-            $month = $month_selected;
-            $days = $dateDay->daysInMonth;
-
-            $dateDayTmp = Carbon::createFromFormat('Y-m-d', "$year-$month-01");
-
-            $year = $dateDayTmp->year;
-            $month = $month_selected;
-            $days = $dateDayTmp->daysInMonth;
-
-            $nowDate=Carbon::now();
-
-            $sessionsDelete=Session::get();
-            $sessionsToDelete=[];
-
-            if($mode_static=='true' || $mode_static==true ){
-
-             foreach($sessionsDelete as $session){
-                $dateSession = Carbon::createFromFormat('Y-m-d H:i:s', $session->date_start);
-                if($dateSession->clone()->month == $month && $dateSession->clone()->year == $year)
-                $sessionsToDelete[]= $session->id;
-             }
-
-            }else{
-                foreach($sessionsDelete as $session){
-                    $sessionsToDelete[]= $session->id;
-                 }
-            }
-
-            if(count($sessionsToDelete)>0)
-            Session::whereIn('id',$sessionsToDelete)->delete();
-
-            $sessionsToCreate=[];
-
-            foreach (range(1, $days) as $day) {
-                $date = Carbon::createFromFormat('Y-m-d', "$year-$month-$day");
-                $dayNoWork=NoWorkDay::where('date', $date->clone()->format('Y-m-d'))->exists();
-
-                $extraRule=true;
-                if($enableStartToday)
-                $extraRule=(($date > $nowDate));
+                $template = Template::where('status', 'true')->first();
+                $sessionsTemplate = SessionTemplate::where('id_template', $template->id)->get();
 
 
-                foreach ($sessionsTemplate as $session) {
+                $dateDay = Carbon::createFromFormat('Y-m-d H:i:s', $start_date);
 
-                if (!$dayNoWork  && $date->clone()->isMonday() === true && $session->day=="monday" && $extraRule)
-                $sessionsToCreate[]=[
-                    'id_group' => $session->id_group,
-                    'id_client' => $session['id_client'] ?? null,
-                    'date_start' => $date->clone()->format('Y-m-d')." ".$session->start,
-                    'date_end' => $date->clone()->format('Y-m-d')." ".$session->end,
-                    'observation' => $session->observation,
-                    'sessions_machine' => $session->sessions_machine,
-                    'sessions_floor' =>$session->sessions_floor,
-                    'sessions_individual' =>$session->sessions_individual,
-                ];
+                $year = $dateDay->year;
+                $month = $month_selected;
+                $days = $dateDay->daysInMonth;
 
-                if (!$dayNoWork  && $date->clone()->isTuesday() === true && $session->day=="tuesday" && $extraRule)
-                $sessionsToCreate[]=[
-                    'id_group' => $session->id_group,
-                    'id_client' => $session['id_client'] ?? null,
-                    'date_start' => $date->clone()->format('Y-m-d')." ".$session->start,
-                    'date_end' => $date->clone()->format('Y-m-d')." ".$session->end,
-                    'observation' => $session->observation,
-                    'sessions_machine' => $session->sessions_machine,
-                    'sessions_floor' =>$session->sessions_floor,
-                    'sessions_individual' =>$session->sessions_individual,
-                ];
+                $dateDayTmp = Carbon::createFromFormat('Y-m-d', "$year-$month-01");
 
-                if (!$dayNoWork  && $date->clone()->isWednesday() === true && $session->day=="wednesday" && $extraRule)
-                $sessionsToCreate[]=[
-                    'id_group' => $session->id_group,
-                    'id_client' => $session['id_client'] ?? null,
-                    'date_start' => $date->clone()->format('Y-m-d')." ".$session->start,
-                    'date_end' => $date->clone()->format('Y-m-d')." ".$session->end,
-                    'observation' => $session->observation,
-                    'sessions_machine' => $session->sessions_machine,
-                    'sessions_floor' =>$session->sessions_floor,
-                    'sessions_individual' =>$session->sessions_individual,
-                ];
+                $year = $dateDayTmp->year;
+                $month = $month_selected;
+                $days = $dateDayTmp->daysInMonth;
 
+                $nowDate = Carbon::now();
 
+                $sessionsDelete = Session::get();
+                $sessionsToDelete = [];
 
-                if (!$dayNoWork  && $date->clone()->isThursday() === true && $session->day=="thursday" && $extraRule)
-                $sessionsToCreate[]=[
-                    'id_group' => $session->id_group,
-                    'id_client' => $session['id_client'] ?? null,
-                    'date_start' => $date->clone()->format('Y-m-d')." ".$session->start,
-                    'date_end' => $date->clone()->format('Y-m-d')." ".$session->end,
-                    'observation' => $session->observation,
-                    'sessions_machine' => $session->sessions_machine,
-                    'sessions_floor' =>$session->sessions_floor,
-                    'sessions_individual' =>$session->sessions_individual,
-                ];
+                if ($mode_static == 'true' || $mode_static == true) {
 
-                if (!$dayNoWork  && $date->clone()->isFriday() === true && $session->day=="friday" && $extraRule)
-                $sessionsToCreate[]=[
-                    'id_group' => $session->id_group,
-                    'id_client' => $session['id_client'] ?? null,
-                    'date_start' => $date->clone()->format('Y-m-d')." ".$session->start,
-                    'date_end' => $date->clone()->format('Y-m-d')." ".$session->end,
-                    'observation' => $session->observation,
-                    'sessions_machine' => $session->sessions_machine,
-                    'sessions_floor' =>$session->sessions_floor,
-                    'sessions_individual' =>$session->sessions_individual,
-                ];
+                    foreach ($sessionsDelete as $session) {
+                        $dateSession = Carbon::createFromFormat('Y-m-d H:i:s', $session->date_start);
+                        if ($dateSession->clone()->month == $month && $dateSession->clone()->year == $year)
+                            $sessionsToDelete[] = $session->id;
+                    }
 
+                } else {
+                    foreach ($sessionsDelete as $session) {
+                        $sessionsToDelete[] = $session->id;
+                    }
                 }
-            }
-            if(count($sessionsToCreate)>0)
-            Session::insert($sessionsToCreate);
+
+                if (count($sessionsToDelete) > 0)
+                    Session::whereIn('id', $sessionsToDelete)->delete();
+
+                $sessionsToCreate = [];
+
+                foreach (range(1, $days) as $day) {
+                    $date = Carbon::createFromFormat('Y-m-d', "$year-$month-$day");
+                    $dayNoWork = NoWorkDay::where('date', $date->clone()->format('Y-m-d'))->exists();
+
+                    $extraRule = true;
+                    if ($enableStartToday)
+                        $extraRule = (($date > $nowDate));
 
 
-            /*auditoria: start*/Pilates::setAudit("Cargo plantilla  id: $template->id"); /*auditoria: end*/
-            return response()->json(['response' => "Plantilla cargada correctamente.", 'status' => true]);
-            }else{
+                    foreach ($sessionsTemplate as $session) {
+
+                        if (!$dayNoWork && $date->clone()->isMonday() === true && $session->day == "monday" && $extraRule)
+                            $sessionsToCreate[] = [
+                                'id_group' => $session->id_group,
+                                'id_client' => $session['id_client'] ?? null,
+                                'date_start' => $date->clone()->format('Y-m-d') . " " . $session->start,
+                                'date_end' => $date->clone()->format('Y-m-d') . " " . $session->end,
+                                'observation' => $session->observation,
+                                'sessions_machine' => $session->sessions_machine,
+                                'sessions_floor' => $session->sessions_floor,
+                                'sessions_individual' => $session->sessions_individual,
+                            ];
+
+                        if (!$dayNoWork && $date->clone()->isTuesday() === true && $session->day == "tuesday" && $extraRule)
+                            $sessionsToCreate[] = [
+                                'id_group' => $session->id_group,
+                                'id_client' => $session['id_client'] ?? null,
+                                'date_start' => $date->clone()->format('Y-m-d') . " " . $session->start,
+                                'date_end' => $date->clone()->format('Y-m-d') . " " . $session->end,
+                                'observation' => $session->observation,
+                                'sessions_machine' => $session->sessions_machine,
+                                'sessions_floor' => $session->sessions_floor,
+                                'sessions_individual' => $session->sessions_individual,
+                            ];
+
+                        if (!$dayNoWork && $date->clone()->isWednesday() === true && $session->day == "wednesday" && $extraRule)
+                            $sessionsToCreate[] = [
+                                'id_group' => $session->id_group,
+                                'id_client' => $session['id_client'] ?? null,
+                                'date_start' => $date->clone()->format('Y-m-d') . " " . $session->start,
+                                'date_end' => $date->clone()->format('Y-m-d') . " " . $session->end,
+                                'observation' => $session->observation,
+                                'sessions_machine' => $session->sessions_machine,
+                                'sessions_floor' => $session->sessions_floor,
+                                'sessions_individual' => $session->sessions_individual,
+                            ];
+
+
+
+                        if (!$dayNoWork && $date->clone()->isThursday() === true && $session->day == "thursday" && $extraRule)
+                            $sessionsToCreate[] = [
+                                'id_group' => $session->id_group,
+                                'id_client' => $session['id_client'] ?? null,
+                                'date_start' => $date->clone()->format('Y-m-d') . " " . $session->start,
+                                'date_end' => $date->clone()->format('Y-m-d') . " " . $session->end,
+                                'observation' => $session->observation,
+                                'sessions_machine' => $session->sessions_machine,
+                                'sessions_floor' => $session->sessions_floor,
+                                'sessions_individual' => $session->sessions_individual,
+                            ];
+
+                        if (!$dayNoWork && $date->clone()->isFriday() === true && $session->day == "friday" && $extraRule)
+                            $sessionsToCreate[] = [
+                                'id_group' => $session->id_group,
+                                'id_client' => $session['id_client'] ?? null,
+                                'date_start' => $date->clone()->format('Y-m-d') . " " . $session->start,
+                                'date_end' => $date->clone()->format('Y-m-d') . " " . $session->end,
+                                'observation' => $session->observation,
+                                'sessions_machine' => $session->sessions_machine,
+                                'sessions_floor' => $session->sessions_floor,
+                                'sessions_individual' => $session->sessions_individual,
+                            ];
+
+                    }
+                }
+                if (count($sessionsToCreate) > 0)
+                    Session::insert($sessionsToCreate);
+
+
+                /*auditoria: start*/
+                Pilates::setAudit("Cargo plantilla  id: $template->id"); /*auditoria: end*/
+                return response()->json(['response' => "Plantilla cargada correctamente.", 'status' => true]);
+            } else {
                 return response()->json(['response' => $validator->errors()->all(), 'status' => false]);
             }
 
-        }else {
+        } else {
             abort(404);
         }
 
@@ -1393,132 +1426,172 @@ class DashboardController extends Controller
 
     public function loadTemplateCheck(Request $request)
     {
-        $month_selected=$request->month;
+        $month_selected = $request->month;
         $start_date = $request->start_date;
         $end_date = $request->end_date;
         $mode_static = $request->mode_static;
 
         $dateDay = Carbon::createFromFormat('Y-m-d H:i:s', $start_date);
         $year = $dateDay->year;
-        $month =  $month_selected;
+        $month = $month_selected;
 
-        $countSessions=0;
-        if($mode_static=='true')
-        $countSessions=Session::whereMonth('date_start', $month)->whereYear('date_start',  $year)->get()->count();
-        if($mode_static=='false')
-        $countSessions=Session::get()->count();
+        $countSessions = 0;
+        if ($mode_static == 'true')
+            $countSessions = Session::whereMonth('date_start', $month)->whereYear('date_start', $year)->get()->count();
+        if ($mode_static == 'false')
+            $countSessions = Session::get()->count();
 
-        if($countSessions<=0)
-        return response()->json(['status' => true]);
+        if ($countSessions <= 0)
+            return response()->json(['status' => true]);
         return response()->json(['status' => false]);
 
     }
 
 
 
-    public function  printItinerary(Request $request)
+    /**
+     * Print the itinerary based on the given request.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function printItinerary(Request $request)
     {
-
+        // Validation rules for the request
         $rules = [
-            "date"=>['date_format:d/m/Y',new RuleExistEmployeeInGroup($request->date)]
+            "date" => ['date_format:d/m/Y', new RuleExistEmployeeInGroup($request->date)]
         ];
-        $messages=[
-        ];
-        $customAttr=[
-        ];
+
+        $messages = []; // Custom error messages
+        $customAttr = []; // Custom attribute names
+
+        // Validate the request data
         $validator = Validator::make($request->all(), $rules, $messages, $customAttr);
 
         if ($request->ajax()) {
-
             if ($validator->passes()) {
+                // Convert the date format to Y-m-d
+                $dateF = Carbon::createFromFormat('d/m/Y', $request->date)->format('Y-m-d');
 
-                $dateF=Carbon::createFromFormat('d/m/Y',$request->date)->format('Y-m-d');
+                $itineraries = []; // Array to store the itineraries
+                $groupsItineraries = []; // Array to store the group itineraries
 
-
-
-               $itineraries=[];
-               $groupsItineraries=[];
-
-               $employees=Employee::get();
-
-
-               foreach ($employees as $key => $employee) {
-            $sessionsEmployee = Session::
-                Join('group', 'session.id_group', '=', 'group.id')
-             ->Join('employee', 'group.id_employee', '=', 'employee.id')
-             ->where('date_start', '>=', "$dateF 00:00:00")
-             ->where('date_end', '<=', "$dateF 23:59:59")
-             ->where('employee.id',  $employee->id)
-             ->groupBy('date_start','date_end','id_group')
-             ->get(['employee.name as employee_name','employee.last_name as employee_last_name','group.name as group_name','date_start','date_end','group.id_room','group.id as group_id']);
+                $employees = Employee::get(); // Get all employees
+                // filter employees assigned to a session
+                $employees = $employees->filter(function ($employee) use ($dateF) {
+                    $sessionsEmployee = Session::
+                        join('group', 'session.id_group', '=', 'group.id')
+                        ->join('employee', 'group.id_employee', '=', 'employee.id')
+                        ->where('date_start', '>=', "$dateF 00:00:00")
+                        ->where('date_end', '<=', "$dateF 23:59:59")
+                        ->where('employee.id', $employee->id)
+                        ->get(['employee.name as employee_name', 'employee.last_name as employee_last_name', 'group.name as group_name', 'date_start', 'date_end', 'group.id_room', 'group.id as group_id']);
+                    return count($sessionsEmployee) > 0;
+                });
 
 
-               $itineraryEmployee=[];
-               $itemItinerary=[];
-               $itemsEmployee=[];
 
+                // Loop through each employee
+                foreach ($employees as $key => $employee) {
+                    // Get sessions for the employee on the given date
+                    // $sessionsEmployee = Session::
+                    //     join('group', 'session.id_group', '=', 'group.id')
+                    //     ->join('employee', 'group.id_employee', '=', 'employee.id')
+                    //     ->where('date_start', '>=', "$dateF 00:00:00")
+                    //     ->where('date_end', '<=', "$dateF 23:59:59")
+                    //     ->where('employee.id',  $employee->id)
+                    //     ->groupBy('date_start', 'date_end', 'id_group')
+                    //     ->get(['employee.name as employee_name', 'employee.last_name as employee_last_name', 'group.name as group_name', 'date_start', 'date_end', 'group.id_room', 'group.id as group_id']);
+                    $sessionsEmployee = Session::
+                        join('group', 'session.id_group', '=', 'group.id')
+                        ->join('employee', 'group.id_employee', '=', 'employee.id')
+                        ->where('date_start', '>=', "$dateF 00:00:00")
+                        ->where('date_end', '<=', "$dateF 23:59:59")
+                        ->where('employee.id', $employee->id)
+                        ->get(['employee.name as employee_name', 'employee.last_name as employee_last_name', 'group.name as group_name', 'date_start', 'date_end', 'group.id_room', 'group.id as group_id']);
+                    $itineraryEmployee = []; // Array to store the employee's itinerary
+                    $itemsEmployee = []; // Array to store the employee's items
+
+                    // Loop through each session for the employee
                     foreach ($sessionsEmployee as $key => $sessionEmployee) {
-                        $itineraryEmployee['employee_name']="$sessionEmployee->employee_name $sessionEmployee->employee_last_name";
+                        $itineraryEmployee['employee_name'] = "$sessionEmployee->employee_name $sessionEmployee->employee_last_name";
+                        $itineraryEmployee['id'] = "$sessionEmployee->id";
+                        $itemItinerary = []; // Array to store the session's itinerary item
+                        $itemItinerary['start'] = Carbon::createFromFormat('Y-m-d H:i:s', $sessionEmployee->date_start)->format('H:i');
+                        $itemItinerary['end'] = Carbon::createFromFormat('Y-m-d H:i:s', $sessionEmployee->date_end)->format('H:i');
+                        $itemItinerary['group_name'] = $sessionEmployee->group_name;
+                        $itemItinerary['room_name'] = Room::where('id', $sessionEmployee->id_room)->get(['name'])->first()->name;
 
-                        $itemItinerary['start']=Carbon::createFromFormat('Y-m-d H:i:s',$sessionEmployee->date_start)->format('H:i');
-                        $itemItinerary['end']=Carbon::createFromFormat('Y-m-d H:i:s',$sessionEmployee->date_end)->format('H:i');
-                        $itemItinerary['group_name']=$sessionEmployee->group_name;
-                        $itemItinerary['room_name']=Room::where('id',$sessionEmployee->id_room)->get(['name'])->first()->name;
-                        $itemItinerary['clients']=Session::
-                        Join('client', 'session.id_client', '=', 'client.id')
-                      ->where('id_group', $sessionEmployee->group_id)
-                      ->where('date_start', '>=', $sessionEmployee->date_start)
-                      ->where('date_end', '<=', $sessionEmployee->date_end)
-                      ->whereNotNull('id_client')
-                      ->get(['client.name','client.last_name'])->toArray();
-                     array_push($itemsEmployee, $itemItinerary);
+                        // $itemItinerary['employees'] = Session::
+                        //     join('employee', 'session.id_employee', '=', 'employee.id')
+                        //     ->where('id_group', $sessionEmployee->group_id)
+                        //     ->where('date_start', '>=', $sessionEmployee->date_start)
+                        //     ->where('date_end', '<=', $sessionEmployee->date_end)
+                        //     ->whereNotNull('id_employee')
+                        //     ->get(['employee.name', 'employee.last_name'])
+                        //     ->toArray();
+                        $itemItinerary['clients'] = Session::
+                            join('client', 'session.id_client', '=', 'client.id')
+                            ->where('date_start', '>=', $sessionEmployee->date_start)
+                            ->where('date_end', '<=', $sessionEmployee->date_end)
+                            ->whereNotNull('id_client')
+                            ->get(['client.name', 'client.last_name'])
+                            ->toArray();
+                        array_push($itemsEmployee, $itemItinerary);
                     }
 
-                    if(count($sessionsEmployee)>0){
-                        $itineraryEmployee['date']=$request->date;
-                        $itineraryEmployee['items_employee']=$itemsEmployee;
+                    if (count($sessionsEmployee) > 0) {
+                        $itineraryEmployee['date'] = $request->date;
+                        $itineraryEmployee['items_employee'] = $itemsEmployee;
                         array_push($itineraries, $itineraryEmployee);
                     }
+                }
 
+                $count = 0;
 
-               }
+                // Group the itineraries into groups of 3
+                do {
+                    $groupItineraries = [];
+                    if (isset($itineraries[$count])) {
+                        array_push($groupItineraries, $itineraries[$count]);
+                        unset($itineraries[$count]);
+                        $count++;
+                    }
+                    if (isset($itineraries[$count])) {
+                        array_push($groupItineraries, $itineraries[$count]);
+                        unset($itineraries[$count]);
+                        $count++;
+                    }
+                    if (isset($itineraries[$count])) {
+                        array_push($groupItineraries, $itineraries[$count]);
+                        unset($itineraries[$count]);
+                        $count++;
+                    }
 
+                    if (count($groupItineraries) > 0) {
+                        array_push($groupsItineraries, $groupItineraries);
+                    }
+                } while (count($itineraries) > 0);
+                // log of groupItineraries
+                Log::info($groupsItineraries);
+                // Generate the PDF using the 'itinerary1' view and save it
+                $useDate = $request->date;
+                $pdf = PDF::loadView('itinerary1', compact('employees', 'useDate', 'groupItineraries'))->setPaper('A4', 'landscape');
+                $content = $pdf->download()->getOriginalContent();
+                $namePdf = "itinerario.pdf";
+                Storage::disk('public')->put($namePdf, $content);
 
-
-           $count=0;
-
-            do {
-
-                $groupItineraries=[];
-                if(isset($itineraries[$count])){array_push($groupItineraries,$itineraries[$count]);unset($itineraries[$count]);$count++;}
-                if(isset($itineraries[$count])){array_push($groupItineraries,$itineraries[$count]);unset($itineraries[$count]);$count++;}
-                if(isset($itineraries[$count])){array_push($groupItineraries,$itineraries[$count]);unset($itineraries[$count]);$count++;}
-
-                if(count($groupItineraries)>0)
-                array_push($groupsItineraries,$groupItineraries);
-
-            } while(count($itineraries)>0);
-
-
-
-            $pdf = PDF::loadView('itinerary1',compact('groupsItineraries'))->setPaper('A4', 'portrait');
-
-            $content = $pdf->download()->getOriginalContent();
-                //return $pdf->stream("itinerario.pdf");
-            $namePdf="itinerario.pdf";
-            Storage::disk('public')->put($namePdf, $content);
-
-
-            return response()->json(['response' => asset("storage/$namePdf"), 'status' => true]);
-            }else{
-            return response()->json(['response' => $validator->errors()->all(), 'status' => false]);
+                // Return the download link as a JSON response
+                return response()->json(['response' => asset("storage/$namePdf"), 'status' => true]);
+            } else {
+                // Return the validation errors as a JSON response
+                return response()->json(['response' => $validator->errors()->all(), 'status' => false]);
             }
-
-        }else {
+        } else {
+            // Return a 404 error if the request is not AJAX
             abort(404);
         }
     }
-
 
 
 }

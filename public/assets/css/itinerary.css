@@ -1,57 +1,31 @@
-
-
-*,
-td,
-table,
-div{
-    font-family: 'opensans' !important;
-    font-size: 10.5px;
-}
-html{
+.box {
+    border: 3px solid #000;
     padding: 10px;
-    text-align: center;
-    height: auto;
+}
+table {
+    width: 100%;
+}
+.big-table {
+    margin: 10px;
+}
+.min-table-tite{
+    font-size: 16px;
+    font-weight: 200;
+
+}
+.hidden-row{
     border: none;
 }
-div.break-now { page-break-inside:avoid; page-break-after:always; }
-.date{
-    text-transform: capitalize;
-    font-size: 12px;
-    font-weight: bold;
-    padding-top: 8px;
-    padding-bottom: 8px;
+td {
+    width: 50%;
 }
-.name-employee{
-    text-transform: capitalize;
-    font-size: 12px;
-    font-weight: bold;
-    padding-top: 8px;
-    padding-bottom: 8px;
+h1 {
+    font-weight: 200;
+    font-size: 18px;
+    display: flex;
+ 
 }
-table{
-    width: 100%;
-    text-align: center;
-    border-collapse: collapse;
-
-}
-table, th, td{
-    border: solid 1px rgb(168, 168, 168);
-    
-}
-
-.title-hours{
-
-    font-weight: bold;
-
-}
-.hours{
-    font-weight: bold;
-
-}
-.title-room{
-    font-weight: bold;
-}
-.title-clients{
-    font-weight: bold;
-border-right: none;
+h2{
+    font-weight: 200;
+    font-size: 16px;
 }
