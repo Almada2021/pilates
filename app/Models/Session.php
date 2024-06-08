@@ -13,8 +13,8 @@ class Session extends Model
     protected $table = 'session';
     protected $guarded = ['id'];
 
-    public $groupsExists=[];
-    public  $roomsExists=[];
+    public $groupsExists = [];
+    public $roomsExists = [];
 
 
     public function getSessionsGroupForCalendar(Request $request)
@@ -67,7 +67,9 @@ class Session extends Model
                 ->where('session.id_group', $group_selected)
                 ->whereNotNull('session.id_client')
                 ->get([
-                    '*', 'session.id as id_session', 'session.observation as observation'
+                    '*',
+                    'session.id as id_session',
+                    'session.observation as observation'
                 ])->map(function ($session) {
                     return $this->analizeFilterSessionsGroup($session);
                 })->count();
@@ -83,7 +85,9 @@ class Session extends Model
                         ->where('session.id_group', $group_selected)
                         ->whereNotNull('session.id_client')
                         ->get([
-                            '*', 'session.id as id_session', 'session.observation as observation'
+                            '*',
+                            'session.id as id_session',
+                            'session.observation as observation'
                         ])->map(function ($session) {
                             return $this->analizeFilterSessionsGroup($session);
                         })->sortBy($order, SORT_NATURAL | SORT_FLAG_CASE, $dir)->values()->all();
@@ -94,7 +98,9 @@ class Session extends Model
                         ->where('session.id_group', $group_selected)
                         ->whereNotNull('session.id_client')
                         ->get([
-                            '*', 'session.id as id_session', 'session.observation as observation'
+                            '*',
+                            'session.id as id_session',
+                            'session.observation as observation'
                         ])->map(function ($session) {
                             return $this->analizeFilterSessionsGroup($session);
                         })
@@ -110,7 +116,9 @@ class Session extends Model
                         ->where('session.id_group', $group_selected)
                         ->whereNotNull('session.id_client')
                         ->get([
-                            '*', 'session.id as id_session', 'session.observation as observation'
+                            '*',
+                            'session.id as id_session',
+                            'session.observation as observation'
                         ])->map(function ($session) {
                             return $this->analizeFilterSessionsGroup($session);
                         })
@@ -126,7 +134,9 @@ class Session extends Model
                         ->where('session.id_group', $group_selected)
                         ->whereNotNull('session.id_client')
                         ->get([
-                            '*', 'session.id as id_session', 'session.observation as observation'
+                            '*',
+                            'session.id as id_session',
+                            'session.observation as observation'
                         ])->map(function ($session) {
                             return $this->analizeFilterSessionsGroup($session);
                         })
@@ -143,7 +153,9 @@ class Session extends Model
                     ->where('session.id_group', $group_selected)
                     ->whereNotNull('session.id_client')
                     ->get([
-                        '*', 'session.id as id_session', 'session.observation as observation'
+                        '*',
+                        'session.id as id_session',
+                        'session.observation as observation'
                     ])
                     ->filter(function ($sale) use ($search, $columns, $request) {
                         return $this->filterSearchSessionsDataTable($sale, $search, $columns, $request);
@@ -153,9 +165,9 @@ class Session extends Model
         }
 
         $result = [
-            'iTotalRecords'        =>  $totalData,
+            'iTotalRecords' => $totalData,
             'iTotalDisplayRecords' => $totalFiltered,
-            'aaData'               =>  $sessions
+            'aaData' => $sessions
         ];
 
         return $result;
@@ -209,43 +221,42 @@ class Session extends Model
             !empty($request->input('end_date'))
         ) {
 
-          
+
 
             $start_date = $request->start_date;
             $end_date = $request->end_date;
 
             $totalData = Session::
-            where('date_start', '>=', $start_date)
-           ->where('date_end', '<=', $end_date)
-           ->where('status',  'enable')
-           ->groupBy('date_start','date_end','id_group')
-           ->get()
-           ->filter(function ($session) {
+                where('date_start', '>=', $start_date)
+                ->where('date_end', '<=', $end_date)
+                ->where('status', 'enable')
+                ->groupBy('date_start', 'date_end', 'id_group')
+                ->get()
+                ->filter(function ($session) {
                     return $this->mapGroupsSessions($session);
-            })->count();
+                })->count();
 
             $totalFiltered = $totalData;
 
             if (empty($request->input('search.value'))) {
 
                 if ($limit == -1) {
-                    $sessions = Session::
-                    where('date_start', '>=', $start_date)
-                   ->where('date_end', '<=', $end_date)
-                   ->where('status',  'enable')
-                   ->groupBy('date_start','date_end','id_group')
-                   ->get()
-                   ->filter(function ($session) {
-                    return $this->mapGroupsSessions($session);
-                    })->sortBy($order, SORT_NATURAL | SORT_FLAG_CASE, $dir)->values()->all();
+                    $sessions = Session::where('date_start', '>=', $start_date)
+                        ->where('date_end', '<=', $end_date)
+                        ->where('status', 'enable')
+                        ->groupBy('date_start', 'date_end', 'id_group') // Add groupBy here
+                        ->get()
+                        ->filter(function ($session) {
+                            return $this->mapGroupsSessions($session);
+                        });
                 } else {
                     $sessions = Session::
-                    where('date_start', '>=', $start_date)
-                   ->where('date_end', '<=', $end_date)
-                   ->where('status',  'enable')
-                   ->groupBy('date_start','date_end','id_group')
-                   ->get()
-                   ->filter(function ($session) {
+                        where('date_start', '>=', $start_date)
+                        ->where('date_end', '<=', $end_date)
+                        ->where('status', 'enable')
+                        ->groupBy('date_start', 'date_end', 'id_group')
+                        ->get()
+                        ->filter(function ($session) {
                             return $this->mapGroupsSessions($session);
                         })
                         ->sortBy($order, SORT_NATURAL | SORT_FLAG_CASE, $dir)
@@ -256,12 +267,12 @@ class Session extends Model
                 $search = $request->input('search.value');
                 if ($limit == -1) {
                     $sessions = Session::
-                    where('date_start', '>=', $start_date)
-                   ->where('date_end', '<=', $end_date)
-                   ->where('status',  'enable')
-                   ->groupBy('date_start','date_end','id_group')
-                   ->get()
-                   ->filter(function ($session) {
+                        where('date_start', '>=', $start_date)
+                        ->where('date_end', '<=', $end_date)
+                        ->where('status', 'enable')
+                        ->groupBy('date_start', 'date_end', 'id_group')
+                        ->get()
+                        ->filter(function ($session) {
                             return $this->mapGroupsSessions($session);
                         })
                         ->filter(function ($session) use ($search, $columns, $request) {
@@ -271,12 +282,12 @@ class Session extends Model
                 } else {
 
                     $sessions = Session::
-                    where('date_start', '>=', $start_date)
-                   ->where('date_end', '<=', $end_date)
-                   ->where('status',  'enable')
-                   ->groupBy('date_start','date_end','id_group')
-                   ->get()
-                   ->filter(function ($session) {
+                        where('date_start', '>=', $start_date)
+                        ->where('date_end', '<=', $end_date)
+                        ->where('status', 'enable')
+                        ->groupBy('date_start', 'date_end', 'id_group')
+                        ->get()
+                        ->filter(function ($session) {
                             return $this->mapGroupsSessions($session);
                         })
                         ->filter(function ($session) use ($search, $columns, $request) {
@@ -288,22 +299,22 @@ class Session extends Model
                 }
 
                 $totalFiltered = Session::
-                where('date_start', '>=', $start_date)
-               ->where('date_end', '<=', $end_date)
-               ->where('status',  'enable')
-               ->groupBy('date_start','date_end','id_group')
-               ->get()
-                ->filter(function ($sale) use ($search, $columns, $request) {
+                    where('date_start', '>=', $start_date)
+                    ->where('date_end', '<=', $end_date)
+                    ->where('status', 'enable')
+                    ->groupBy('date_start', 'date_end', 'id_group')
+                    ->get()
+                    ->filter(function ($sale) use ($search, $columns, $request) {
                         return $this->filterSearchGroupsSessions($sale, $search, $columns, $request);
-                 })
+                    })
                     ->count();
             }
         }
 
         $result = [
-            'iTotalRecords'        =>  $totalData,
+            'iTotalRecords' => $totalData,
             'iTotalDisplayRecords' => $totalFiltered,
-            'aaData'               =>  $sessions
+            'aaData' => $sessions
         ];
 
         return $result;
@@ -329,7 +340,7 @@ class Session extends Model
 
         $totalData = 0;
         $totalFiltered = $totalData;
-     
+
 
         //hire
 
@@ -341,23 +352,23 @@ class Session extends Model
             !empty($request->input('group_selected'))
         ) {
             $group_selected = $request->group_selected;
-            $group_selected=Group::where('id',$request->group_selected)->first();
-            $type_room= Room::where('id',$group_selected->id_room)->first()->type_room;
+            $group_selected = Group::where('id', $request->group_selected)->first();
+            $type_room = Room::where('id', $group_selected->id_room)->first()->type_room;
 
-          
+
 
             $start_date = $request->start_date;
             $end_date = $request->end_date;
 
             $totalData = Session::
-            where('date_start', '>=', $start_date)
-           ->where('date_end', '<=', $end_date)
-           ->where('status',  'enable')
-           ->groupBy('date_start','date_end','id_group')
-           ->get()
-           ->filter(function ($session) use($type_room){
-                    return $this->mapGroupsSessions2($session,$type_room);
-            })->count();
+                where('date_start', '>=', $start_date)
+                ->where('date_end', '<=', $end_date)
+                ->where('status', 'enable')
+                ->groupBy('date_start', 'date_end', 'id_group')
+                ->get()
+                ->filter(function ($session) use ($type_room) {
+                    return $this->mapGroupsSessions2($session, $type_room);
+                })->count();
 
             $totalFiltered = $totalData;
 
@@ -365,23 +376,23 @@ class Session extends Model
 
                 if ($limit == -1) {
                     $sessions = Session::
-                    where('date_start', '>=', $start_date)
-                   ->where('date_end', '<=', $end_date)
-                   ->where('status',  'enable')
-                   ->groupBy('date_start','date_end','id_group')
-                   ->get()
-                   ->filter(function ($session) use($type_room) {
-                    return $this->mapGroupsSessions2($session,$type_room);
-                    })->sortBy($order, SORT_NATURAL | SORT_FLAG_CASE, $dir)->values()->all();
+                        where('date_start', '>=', $start_date)
+                        ->where('date_end', '<=', $end_date)
+                        ->where('status', 'enable')
+                        ->groupBy('date_start', 'date_end', 'id_group')
+                        ->get()
+                        ->filter(function ($session) use ($type_room) {
+                            return $this->mapGroupsSessions2($session, $type_room);
+                        })->sortBy($order, SORT_NATURAL | SORT_FLAG_CASE, $dir)->values()->all();
                 } else {
                     $sessions = Session::
-                    where('date_start', '>=', $start_date)
-                   ->where('date_end', '<=', $end_date)
-                   ->where('status',  'enable')
-                   ->groupBy('date_start','date_end','id_group')
-                   ->get()
-                   ->filter(function ($session) use($type_room) {
-                            return $this->mapGroupsSessions2($session,$type_room);
+                        where('date_start', '>=', $start_date)
+                        ->where('date_end', '<=', $end_date)
+                        ->where('status', 'enable')
+                        ->groupBy('date_start', 'date_end', 'id_group')
+                        ->get()
+                        ->filter(function ($session) use ($type_room) {
+                            return $this->mapGroupsSessions2($session, $type_room);
                         })
                         ->sortBy($order, SORT_NATURAL | SORT_FLAG_CASE, $dir)
                         ->skip($start)->take($limit)
@@ -391,12 +402,12 @@ class Session extends Model
                 $search = $request->input('search.value');
                 if ($limit == -1) {
                     $sessions = Session::
-                    where('date_start', '>=', $start_date)
-                   ->where('date_end', '<=', $end_date)
-                   ->where('status',  'enable')
-                   ->groupBy('date_start','date_end','id_group')
-                   ->get()
-                   ->filter(function ($session) use($type_room) {
+                        where('date_start', '>=', $start_date)
+                        ->where('date_end', '<=', $end_date)
+                        ->where('status', 'enable')
+                        ->groupBy('date_start', 'date_end', 'id_group')
+                        ->get()
+                        ->filter(function ($session) use ($type_room) {
                             return $this->mapGroupsSessions2($session, $type_room);
                         })
                         ->filter(function ($session) use ($search, $columns, $request) {
@@ -406,13 +417,13 @@ class Session extends Model
                 } else {
 
                     $sessions = Session::
-                    where('date_start', '>=', $start_date)
-                   ->where('date_end', '<=', $end_date)
-                   ->where('status',  'enable')
-                   ->groupBy('date_start','date_end','id_group')
-                   ->get()
-                   ->filter(function ($session) use($type_room) {
-                            return $this->mapGroupsSessions2($session,$type_room);
+                        where('date_start', '>=', $start_date)
+                        ->where('date_end', '<=', $end_date)
+                        ->where('status', 'enable')
+                        ->groupBy('date_start', 'date_end', 'id_group')
+                        ->get()
+                        ->filter(function ($session) use ($type_room) {
+                            return $this->mapGroupsSessions2($session, $type_room);
                         })
                         ->filter(function ($session) use ($search, $columns, $request) {
                             return $this->filterSearchGroupsSessions($session, $search, $columns, $request);
@@ -423,22 +434,22 @@ class Session extends Model
                 }
 
                 $totalFiltered = Session::
-                where('date_start', '>=', $start_date)
-               ->where('date_end', '<=', $end_date)
-               ->where('status',  'enable')
-               ->groupBy('date_start','date_end','id_group')
-               ->get()
-                ->filter(function ($sale) use ($search, $columns, $request) {
+                    where('date_start', '>=', $start_date)
+                    ->where('date_end', '<=', $end_date)
+                    ->where('status', 'enable')
+                    ->groupBy('date_start', 'date_end', 'id_group')
+                    ->get()
+                    ->filter(function ($sale) use ($search, $columns, $request) {
                         return $this->filterSearchGroupsSessions($sale, $search, $columns, $request);
-                 })
+                    })
                     ->count();
             }
         }
 
         $result = [
-            'iTotalRecords'        =>  $totalData,
+            'iTotalRecords' => $totalData,
             'iTotalDisplayRecords' => $totalFiltered,
-            'aaData'               =>  $sessions
+            'aaData' => $sessions
         ];
 
         return $result;
@@ -446,92 +457,92 @@ class Session extends Model
 
     function mapGroupsSessions($session)
     {
-        $group=[];
- 
-      
-        $group=Group::where('id',$session->id_group)->first();
-        $room =Room::where('id', $group->id_room)->first();
-        $group['room_group']=$room;
- 
+        $group = [];
 
-        $status = Pilates::getRealStatusGroupByNumFormatCalendar($session->id_group, $group['room_group'],$session->date_start, $session->date_end);
+
+        $group = Group::where('id', $session->id_group)->first();
+        $room = Room::where('id', $group->id_room)->first();
+        $group['room_group'] = $room;
+
+
+        $status = Pilates::getRealStatusGroupByNumFormatCalendar($session->id_group, $group['room_group'], $session->date_start, $session->date_end);
 
         $group['status'] = $status['num'];
         $group['status_format'] = $status['format'];
 
-  
-        $group['date_start']=$session->date_start;
-        $group['date_end']=$session->date_end;
-        $group['id_group']=$session->id_group;
-        $group['room']=$group['room_group'];
-        $group['room']=$group['room_group'];
 
-        if($group['id_employee']!=null){
-            $status= Pilates::getStatusEmployeeGroupBySessionGroupSetEmployee($group['id_employee'],$session->date_start,$session->date_end,false);
-            $group['status_employee']=($group['id_employee']!=null)?$status:false;
-        }else{
-            $group['status_employee']=false;
+        $group['date_start'] = $session->date_start;
+        $group['date_end'] = $session->date_end;
+        $group['id_group'] = $session->id_group;
+        $group['room'] = $group['room_group'];
+        $group['room'] = $group['room_group'];
+
+        if ($group['id_employee'] != null) {
+            $status = Pilates::getStatusEmployeeGroupBySessionGroupSetEmployee($group['id_employee'], $session->date_start, $session->date_end, false);
+            $group['status_employee'] = ($group['id_employee'] != null) ? $status : false;
+        } else {
+            $group['status_employee'] = false;
         }
 
 
 
-        if($group['status_employee']==true){
-        return false;
-        }else{
-        $session['group'] = json_decode($group);
-        $session['date'] = Carbon::createFromFormat('Y-m-d H:i:s', $session->date_start)->format('d/m/Y');
-        $session['start_date'] = Carbon::createFromFormat('Y-m-d H:i:s', $session->date_start)->format('H:i');
-        $session['end_date'] = Carbon::createFromFormat('Y-m-d H:i:s', $session->date_end)->format('H:i');
-        $session['type'] = $group['room_group']['type_room'];
-        $employeeTmp=null;
-        $session['employee_name'] = 'Sin empleado';
-        
-        if($group['id_employee']!=null){
-        $employeeTmp=Employee::where('id',$group['id_employee'])->first();
-        $session['employee_name'] = $employeeTmp['name']." ".$employeeTmp['last_name'].", sin horario o su horario ha cambiado.";
-        }
-        $session['employee'] = $employeeTmp;
-    
+        if ($group['status_employee'] == true) {
+            return false;
+        } else {
+            $session['group'] = json_decode($group);
+            $session['date'] = Carbon::createFromFormat('Y-m-d H:i:s', $session->date_start)->format('d/m/Y');
+            $session['start_date'] = Carbon::createFromFormat('Y-m-d H:i:s', $session->date_start)->format('H:i');
+            $session['end_date'] = Carbon::createFromFormat('Y-m-d H:i:s', $session->date_end)->format('H:i');
+            $session['type'] = $group['room_group']['type_room'];
+            $employeeTmp = null;
+            $session['employee_name'] = 'Sin empleado';
 
-        return $session;
+            if ($group['id_employee'] != null) {
+                $employeeTmp = Employee::where('id', $group['id_employee'])->first();
+                $session['employee_name'] = $employeeTmp['name'] . " " . $employeeTmp['last_name'] . ", sin horario o su horario ha cambiado.";
+            }
+            $session['employee'] = $employeeTmp;
+
+
+            return $session;
         }
-     
+
     }
 
 
-    function mapGroupsSessions2($session,$type_room)
+    function mapGroupsSessions2($session, $type_room)
     {
-        $group=[];
- 
-      
-        $group=Group::where('id',$session->id_group)->first();
-        $room =Room::where('id', $group->id_room)->first();
-        $group['room_group']=$room;
- 
+        $group = [];
 
-        $status = Pilates::getRealStatusGroupByNumFormatCalendar($session->id_group, $group['room_group'],$session->date_start, $session->date_end);
+
+        $group = Group::where('id', $session->id_group)->first();
+        $room = Room::where('id', $group->id_room)->first();
+        $group['room_group'] = $room;
+
+
+        $status = Pilates::getRealStatusGroupByNumFormatCalendar($session->id_group, $group['room_group'], $session->date_start, $session->date_end);
 
         $group['status'] = $status['num'];
         $group['status_format'] = $status['format'];
 
-  
-        $group['date_start']=$session->date_start;
-        $group['date_end']=$session->date_end;
-        $group['id_group']=$session->id_group;
-        $group['room']=$group['room_group'];
 
-        if($status['num']===1 || $type_room!=$group['room_group']['type_room']){
+        $group['date_start'] = $session->date_start;
+        $group['date_end'] = $session->date_end;
+        $group['id_group'] = $session->id_group;
+        $group['room'] = $group['room_group'];
 
-        return false;
-        }else{
-        $session['group'] = json_decode($group);
-        $session['date'] = Carbon::createFromFormat('Y-m-d H:i:s', $session->date_start)->format('d/m/Y');
-        $session['start_date'] = Carbon::createFromFormat('Y-m-d H:i:s', $session->date_start)->format('H:i');
-        $session['end_date'] = Carbon::createFromFormat('Y-m-d H:i:s', $session->date_end)->format('H:i');
-        $session['type'] = $group['room_group']['type_room'];
-        return $session;
+        if ($status['num'] === 1 || $type_room != $group['room_group']['type_room']) {
+
+            return false;
+        } else {
+            $session['group'] = json_decode($group);
+            $session['date'] = Carbon::createFromFormat('Y-m-d H:i:s', $session->date_start)->format('d/m/Y');
+            $session['start_date'] = Carbon::createFromFormat('Y-m-d H:i:s', $session->date_start)->format('H:i');
+            $session['end_date'] = Carbon::createFromFormat('Y-m-d H:i:s', $session->date_end)->format('H:i');
+            $session['type'] = $group['room_group']['type_room'];
+            return $session;
         }
-     
+
     }
 
 

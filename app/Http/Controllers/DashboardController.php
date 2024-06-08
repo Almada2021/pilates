@@ -39,6 +39,7 @@ use Carbon\Carbon;
 use Carbon\Traits\Date;
 use DateTime;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -1461,7 +1462,8 @@ class DashboardController extends Controller
         $rules = [
             "date" => ['date_format:d/m/Y', new RuleExistEmployeeInGroup($request->date)]
         ];
-
+        $currentUserId = Auth::id();
+        $employee = Employee::where('id', $currentUserId)->first();
         $messages = []; // Custom error messages
         $customAttr = []; // Custom attribute names
 
@@ -1473,112 +1475,56 @@ class DashboardController extends Controller
                 // Convert the date format to Y-m-d
                 $dateF = Carbon::createFromFormat('d/m/Y', $request->date)->format('Y-m-d');
 
-                $itineraries = []; // Array to store the itineraries
-                $groupsItineraries = []; // Array to store the group itineraries
+                $groups = Group::join('session', 'session.id_group', '=', 'group.id')
+                    ->join('employee', 'group.id_employee', '=', 'employee.id')
+                    ->where('date_start', '>=', "$dateF 00:00:00")
+                    ->where('date_end', '<=', "$dateF 23:59:59")
+                    ->where('employee.id', $currentUserId)
+                    ->distinct()
+                    ->get(['group.name as group_name', 'date_start', 'date_end', 'group.id_room', 'group.id as group_id']);
 
-                $employees = Employee::get(); // Get all employees
-                // filter employees assigned to a session
-                $employees = $employees->filter(function ($employee) use ($dateF) {
-                    $sessionsEmployee = Session::
-                        join('group', 'session.id_group', '=', 'group.id')
-                        ->join('employee', 'group.id_employee', '=', 'employee.id')
+                $itemsEmployee = []; // Array to store the employee's items
+
+                foreach ($groups as $group) {
+                    $sessions = Session::where('id_group', $group->group_id)
                         ->where('date_start', '>=', "$dateF 00:00:00")
                         ->where('date_end', '<=', "$dateF 23:59:59")
-                        ->where('employee.id', $employee->id)
-                        ->get(['employee.name as employee_name', 'employee.last_name as employee_last_name', 'group.name as group_name', 'date_start', 'date_end', 'group.id_room', 'group.id as group_id']);
-                    return count($sessionsEmployee) > 0;
-                });
+                        ->distinct()
+                        ->get();
 
+                    $sessions = $sessions->unique(function ($item) {
+                        return $item['start'] . $item['end'] . $item['group_name'] . $item['room_name'] . json_encode($item['clients']);
+                    });
 
-
-                // Loop through each employee
-                foreach ($employees as $key => $employee) {
-                    // Get sessions for the employee on the given date
-                    // $sessionsEmployee = Session::
-                    //     join('group', 'session.id_group', '=', 'group.id')
-                    //     ->join('employee', 'group.id_employee', '=', 'employee.id')
-                    //     ->where('date_start', '>=', "$dateF 00:00:00")
-                    //     ->where('date_end', '<=', "$dateF 23:59:59")
-                    //     ->where('employee.id',  $employee->id)
-                    //     ->groupBy('date_start', 'date_end', 'id_group')
-                    //     ->get(['employee.name as employee_name', 'employee.last_name as employee_last_name', 'group.name as group_name', 'date_start', 'date_end', 'group.id_room', 'group.id as group_id']);
-                    $sessionsEmployee = Session::
-                        join('group', 'session.id_group', '=', 'group.id')
-                        ->join('employee', 'group.id_employee', '=', 'employee.id')
-                        ->where('date_start', '>=', "$dateF 00:00:00")
-                        ->where('date_end', '<=', "$dateF 23:59:59")
-                        ->where('employee.id', $employee->id)
-                        ->get(['employee.name as employee_name', 'employee.last_name as employee_last_name', 'group.name as group_name', 'date_start', 'date_end', 'group.id_room', 'group.id as group_id']);
-                    $itineraryEmployee = []; // Array to store the employee's itinerary
-                    $itemsEmployee = []; // Array to store the employee's items
-
-                    // Loop through each session for the employee
-                    foreach ($sessionsEmployee as $key => $sessionEmployee) {
-                        $itineraryEmployee['employee_name'] = "$sessionEmployee->employee_name $sessionEmployee->employee_last_name";
-                        $itineraryEmployee['id'] = "$sessionEmployee->id";
+                    $sessions = $sessions->sortBy(function ($item) {
+                        return Carbon::createFromFormat('Y-m-d H:i:s', $item->date_start);
+                    });
+                    foreach ($sessions as $session) {
                         $itemItinerary = []; // Array to store the session's itinerary item
-                        $itemItinerary['start'] = Carbon::createFromFormat('Y-m-d H:i:s', $sessionEmployee->date_start)->format('H:i');
-                        $itemItinerary['end'] = Carbon::createFromFormat('Y-m-d H:i:s', $sessionEmployee->date_end)->format('H:i');
-                        $itemItinerary['group_name'] = $sessionEmployee->group_name;
-                        $itemItinerary['room_name'] = Room::where('id', $sessionEmployee->id_room)->get(['name'])->first()->name;
-
-                        // $itemItinerary['employees'] = Session::
-                        //     join('employee', 'session.id_employee', '=', 'employee.id')
-                        //     ->where('id_group', $sessionEmployee->group_id)
-                        //     ->where('date_start', '>=', $sessionEmployee->date_start)
-                        //     ->where('date_end', '<=', $sessionEmployee->date_end)
-                        //     ->whereNotNull('id_employee')
-                        //     ->get(['employee.name', 'employee.last_name'])
-                        //     ->toArray();
-                        $itemItinerary['clients'] = Session::
-                            join('client', 'session.id_client', '=', 'client.id')
-                            ->where('date_start', '>=', $sessionEmployee->date_start)
-                            ->where('date_end', '<=', $sessionEmployee->date_end)
+                        $itemItinerary['id'] = $session->id; // Add session ID
+                        Log::info(json_encode($session));
+                        // $itemItinerary['created_at'] = $session->createdAt; // Add session ID
+                        $itemItinerary['start'] = Carbon::createFromFormat('Y-m-d H:i:s', $session->date_start)->format('H:i');
+                        $itemItinerary['end'] = Carbon::createFromFormat('Y-m-d H:i:s', $session->date_end)->format('H:i');
+                        $itemItinerary['group_name'] = $group->group_name;
+                        $itemItinerary['room_name'] = Room::where('id', $group->id_room)->get(['name'])->first()->name;
+                        $itemItinerary['clients'] = Client::join('session', 'session.id_client', '=', 'client.id')
+                            ->where('id_group', $group->group_id)
+                            ->where('date_start', '>=', "$dateF 00:00:00")
+                            ->where('date_end', '<=', "$dateF 23:59:59")
                             ->whereNotNull('id_client')
-                            ->get(['client.name', 'client.last_name'])
-                            ->toArray();
+                            ->orderBy('date_start', 'desc')
+                            ->distinct()
+                            ->get(['client.name', 'client.last_name'])->toArray();
                         array_push($itemsEmployee, $itemItinerary);
-                    }
-
-                    if (count($sessionsEmployee) > 0) {
-                        $itineraryEmployee['date'] = $request->date;
-                        $itineraryEmployee['items_employee'] = $itemsEmployee;
-                        array_push($itineraries, $itineraryEmployee);
                     }
                 }
 
-                $count = 0;
-
-                // Group the itineraries into groups of 3
-                do {
-                    $groupItineraries = [];
-                    if (isset($itineraries[$count])) {
-                        array_push($groupItineraries, $itineraries[$count]);
-                        unset($itineraries[$count]);
-                        $count++;
-                    }
-                    if (isset($itineraries[$count])) {
-                        array_push($groupItineraries, $itineraries[$count]);
-                        unset($itineraries[$count]);
-                        $count++;
-                    }
-                    if (isset($itineraries[$count])) {
-                        array_push($groupItineraries, $itineraries[$count]);
-                        unset($itineraries[$count]);
-                        $count++;
-                    }
-
-                    if (count($groupItineraries) > 0) {
-                        array_push($groupsItineraries, $groupItineraries);
-                    }
-                } while (count($itineraries) > 0);
-                // log of groupItineraries
-                Log::info($groupsItineraries);
                 // Generate the PDF using the 'itinerary1' view and save it
                 $useDate = $request->date;
-                $pdf = PDF::loadView('itinerary1', compact('employees', 'useDate', 'groupItineraries'))->setPaper('A4', 'landscape');
+                $pdf = PDF::loadView('itinerary1', compact(['itemsEmployee', 'useDate', 'employee']))->setPaper('A4', 'landscape');
                 $content = $pdf->download()->getOriginalContent();
-                $namePdf = "itinerario.pdf";
+                $namePdf = "itinerario" . $currentUserId . ".pdf";
                 Storage::disk('public')->put($namePdf, $content);
 
                 // Return the download link as a JSON response

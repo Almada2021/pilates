@@ -21,7 +21,7 @@ class ValidationDocument extends FormRequest
      // store
             return [
                 'name_document' => 'required|max:100|required_with:front|required_with:back',
-                'front' => 'required|nullable|required_with:back',
+                'front' => 'nullable',
                 'back' => 'nullable',
                 'observation' => 'nullable|max:5000'
             ];

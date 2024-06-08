@@ -2,45 +2,52 @@
 <html>
 
 <head>
+    <style>
+        .page-break {
+            page-break-after: always;
+        }
+    </style>
     <link href="{{ public_path('assets/css/itinerary.css') }}" rel="stylesheet" type="text/css" />
 </head>
 
 <body>
-    {{-- add h1 who print the date in format dd/mm/yyyy --}}
-    <h1>{{ $useDate }}</h1>
-    {{-- loop emplooyes variable --}}
-    @foreach ($employees->chunk(2) as $chunk)
-        <table cellspacing="0" border="1" class="big-table">
+
+    <div class="title-container">
+        <h1>
+            <div class="date">
+                {{ $useDate }}
+            </div>
+            {{ mb_convert_encoding($employee['name'], 'UTF-8') }}
+            {{ mb_convert_encoding($employee['last_name'], 'UTF-8') }}
+        </h1>
+    </div>
+    <table>
+        <thead>
             <tr>
-                @foreach ($chunk as $employee)
-                    <td class="box">
-                        {{-- add p element with employee name and last name and convert in case of unknow characters --}}
-                        <h2>{{ mb_convert_encoding($employee->name, 'UTF-8', 'UTF-8') }}
-                            {{ mb_convert_encoding($employee->last_name, 'UTF-8', 'UTF-8') }}</h2>
-                        <table border="0">
-                            <tr class="hidden-row">
-                                <td class="min-table-tite">Hora</td>
-                                <td class="min-table-tite">Sala</td>
-                                <td class="min-table-tite">Grupo</td>
-                            </tr>
-
-                            {{-- print groupItineraries --}}
-                            @foreach ($groupItineraries as $groupItinerary)
-                                {{-- recorre todo el groupitineraries y encuentra el que tiene el mismo employee --}}
-                                <tr>
-                                    <td>g</td>
-                                    <td>g</td>
-                                    <td>g</td>
-                                </tr>
-                            @endforeach
-                            
-                        </table>
-                    </td>
-                @endforeach
+                <th>Hora</th>
+                <th>Grupo</th>
+                <th>Clientes</th>
             </tr>
-
-        </table>
-    @endforeach
+        </thead>
+        <tbody>
+            @php
+                usort($itemsEmployee, function ($a, $b) {
+                    return strtotime($a['start']) - strtotime($b['start']);
+                });
+            @endphp
+            @foreach ($itemsEmployee as $item)
+                <tr>
+                    <td>{{ $item['start'] }} - {{ $item['end'] }}</td>
+                    <td>{{ $item['group_name'] }}</td>
+                    <td class="special-td">
+                        @foreach ($item['clients'] as $index => $client)
+                            {{ $index + 1 }}. {{ $client['name'] }} {{ $client['last_name'] }}<br>
+                        @endforeach
+                    </td>
+                </tr>
+            @endforeach
+        </tbody>
+    </table>
 </body>
 
 </html>

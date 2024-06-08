@@ -300,14 +300,18 @@ var KTDatatablesDataSourceAjaxServerDocuments = (function () {
                             <div class="text-left d-inline-block p-1 w-100">
                             <span class="span-table-cover-item d-inline">Se agrego:</span>    
                             <span class="span-table-cover-item-data d-inline">` +
-                                (data.created_at.substring(0,10)+ " " + data.created_at.substring(11,19))+
+                                (data.created_at.substring(0, 10) +
+                                    " " +
+                                    data.created_at.substring(11, 19)) +
                                 `</span>    
                             </div>
                             <div class="text-left d-inline-block p-1 w-100">
                             <span class="span-table-cover-item d-inline">Ultima actualización:</span>    
                             <span class="span-table-cover-item-data d-inline">` +
-                            (data.updated_at.substring(0,10)+ " " + data.updated_at.substring(11,19))+
-                            `</span>   
+                                (data.updated_at.substring(0, 10) +
+                                    " " +
+                                    data.updated_at.substring(11, 19)) +
+                                `</span>   
                             <div class="w-100 text-left">
                             <button class="btn btn-primary   d-inline  btn-show-observation-document" type="button" ` +
                                 observaciones +
@@ -884,3 +888,61 @@ function showHiddenFields(tableId, btn) {
     });
 }
 ////////////////////////////////////////////////////////////////protected columns
+// Spech Recognition when you press click en speech id btn the function start and when end the value is added to  the textarea id observation
+
+// Check if the browser supports the SpeechRecognition API
+if ("webkitSpeechRecognition" in window) {
+    var recognition = new webkitSpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    navigator.mediaDevices
+        .getUserMedia({ audio: true })
+        .then(function (stream) {
+            // You have access to the microphone
+            console.log("Microphone access granted");
+            // You can now start speech recognition
+            recognition.start();
+        })
+        .catch(function (err) {
+            // Microphone access was denied or there was another error
+            console.error("Microphone access denied or error: " + err);
+        });
+
+    recognition.onresult = function (event) {
+        var textarea = document.getElementById("observation");
+        for (var i = event.resultIndex; i < event.results.length; ++i) {
+            if (event.results[i].isFinal) {
+                textarea.value += event.results[i][0].transcript;
+            }
+        }
+    };
+
+    recognition.onerror = function (event) {
+        console.error("Speech recognition error occurred: " + event.error);
+    };
+
+    var speechBtn = document.getElementById("speech");
+    let checker = false;
+    speechBtn.onclick = function (e) {
+        speechBtn.innerHTML= !checker ? "Escuchando..." : "Grabar"
+        // speechBtn.style.backgroundColor = "red";
+        checker = !checker;
+        e.preventDefault();
+        navigator.mediaDevices
+            .getUserMedia({ audio: true })
+            .then(function (stream) {
+                // You have access to the microphone
+                console.log("Microphone access granted");
+                // You can now start speech recognition
+                recognition.start();
+            })
+            .catch(function (err) {
+                // Microphone access was denied or there was another error
+                console.error("Microphone access denied or error: " + err);
+            });
+    };
+} else {
+    alert(
+        "Your browser does not support the Speech Recognition API. Please use a compatible browser like Google Chrome."
+    );
+}

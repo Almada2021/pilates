@@ -23,52 +23,53 @@ use App\Rules\sameTypeRoomGroup;
 use DateTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-
+use Illuminate\Support\Facades\Log;
 class TemplateController extends Controller
 {
 
     public function index()
     {
-        $roles = Rol::where('id',2)->orderBy('id')->pluck('name', 'id')->toArray();
+        $roles = Rol::where('id', 2)->orderBy('id')->pluck('name', 'id')->toArray();
 
-        $idDefault=null;
-        $templateActive= Template::where('status',"true");
-        if($templateActive->exists()){
-        $idDefault=$templateActive->first()->id;
-        }else{
-        $templateFresh=Template::orderBy('id', 'desc');
-        if($templateFresh->count()>0){
-        $idDefault=$templateFresh->first()->id;
-        }else{
-        $idDefault=null;
+        $idDefault = null;
+        $templateActive = Template::where('status', "true");
+        if ($templateActive->exists()) {
+            $idDefault = $templateActive->first()->id;
+        } else {
+            $templateFresh = Template::orderBy('id', 'desc');
+            if ($templateFresh->count() > 0) {
+                $idDefault = $templateFresh->first()->id;
+            } else {
+                $idDefault = null;
+            }
         }
-        }
 
-        $templates=Template::orderBy('id', 'desc')->get();
+        $templates = Template::orderBy('id', 'desc')->get();
 
-        $defaultTimes=[
-            ['start'=>'08:05:00','end'=>'09:00:00'],
-            ['start'=>'09:05:00','end'=>'10:00:00'],
-            ['start'=>'10:05:00','end'=>'11:00:00'],
-            ['start'=>'11:05:00','end'=>'12:00:00'],
-            ['start'=>'12:05:00','end'=>'13:00:00'],
-            ['start'=>'13:05:00','end'=>'14:00:00'],
-            ['start'=>'14:05:00','end'=>'15:00:00'],
-            ['start'=>'15:05:00','end'=>'16:00:00'],
-            ['start'=>'16:05:00','end'=>'17:00:00'],
-            ['start'=>'17:05:00','end'=>'18:00:00'],
-            ['start'=>'18:05:00','end'=>'19:00:00'],
-            ['start'=>'19:05:00','end'=>'20:00:00'],
-            ['start'=>'20:05:00','end'=>'21:00:00'],
-            ['start'=>'21:05:00','end'=>'22:00:00']
+        $defaultTimes = [
+            ['start' => '08:05:00', 'end' => '09:00:00'],
+            ['start' => '09:05:00', 'end' => '10:00:00'],
+            ['start' => '10:05:00', 'end' => '11:00:00'],
+            ['start' => '11:05:00', 'end' => '12:00:00'],
+            ['start' => '12:05:00', 'end' => '13:00:00'],
+            ['start' => '13:05:00', 'end' => '14:00:00'],
+            ['start' => '14:05:00', 'end' => '15:00:00'],
+            ['start' => '15:05:00', 'end' => '16:00:00'],
+            ['start' => '16:05:00', 'end' => '17:00:00'],
+            ['start' => '17:05:00', 'end' => '18:00:00'],
+            ['start' => '18:05:00', 'end' => '19:00:00'],
+            ['start' => '19:05:00', 'end' => '20:00:00'],
+            ['start' => '20:05:00', 'end' => '21:00:00'],
+            ['start' => '21:05:00', 'end' => '22:00:00']
         ];
 
-        return view('template', compact('roles','idDefault','templates','defaultTimes'));
+        return view('template', compact('roles', 'idDefault', 'templates', 'defaultTimes'));
 
     }
 
-    public function getTemplateList(){
-        $templates=Template::orderBy('id', 'desc')->get();
+    public function getTemplateList()
+    {
+        $templates = Template::orderBy('id', 'desc')->get();
         return response()->json(['response' => '', 'status' => true, 'data' => $templates]);
     }
 
@@ -76,40 +77,40 @@ class TemplateController extends Controller
     public function getData(Request $request)
     {
 
-      $json = Template::where('id',$request->template_selected)->first();
-      if ($json->default_time == '' || $json->default_time == null) {
-        $defaultTimes=[
-            ['start'=>'08:05:00','end'=>'09:00:00','start_formated'=>'8:05 AM','end_formated'=>'9:00 AM'],
-            ['start'=>'09:05:00','end'=>'10:00:00','start_formated'=>'9:05 AM','end_formated'=>'10:00 AM'],
-            ['start'=>'10:05:00','end'=>'11:00:00','start_formated'=>'10:05 AM','end_formated'=>'11:00 AM'],
-            ['start'=>'11:05:00','end'=>'12:00:00','start_formated'=>'11:05 AM','end_formated'=>'12:00 PM'],
-            ['start'=>'12:05:00','end'=>'13:00:00','start_formated'=>'12:05 PM','end_formated'=>'1:00 PM'],
-            ['start'=>'13:05:00','end'=>'14:00:00','start_formated'=>'1:05 PM','end_formated'=>'2:00 PM'],
-            ['start'=>'14:05:00','end'=>'15:00:00','start_formated'=>'2:05 PM','end_formated'=>'3:00 PM'],
-            ['start'=>'15:00:00','end'=>'15:55:00','start_formated'=>'3:00 PM','end_formated'=>'3:55 PM'],
-            ['start'=>'15:55:00','end'=>'16:50:00','start_formated'=>'3:55 PM','end_formated'=>'4:50 PM'],
-            ['start'=>'16:50:00','end'=>'17:45:00','start_formated'=>'4:50 PM','end_formated'=>'5:45 PM'],
-            ['start'=>'17:45:00','end'=>'18:40:00','start_formated'=>'5:45 PM','end_formated'=>'6:40 PM'],
-            ['start'=>'18:40:00','end'=>'19:35:00','start_formated'=>'6:40 PM','end_formated'=>'7:35 PM'],
-            ['start'=>'20:05:00','end'=>'21:00:00','start_formated'=>'8:05 PM','end_formated'=>'9:00 PM'],
-            ['start'=>'21:05:00','end'=>'22:00:00','start_formated'=>'9:05 PM','end_formated'=>'10:00 PM']
-        ];
-        $json->default_time  = json_encode($defaultTimes);
-        $json->save();
-      }
-      $defaultTimes= json_decode($json->default_time);
-    // return response()->json($defaultTimes);
+        $json = Template::where('id', $request->template_selected)->first();
+        if ($json->default_time == '' || $json->default_time == null) {
+            $defaultTimes = [
+                ['start' => '08:05:00', 'end' => '09:00:00', 'start_formated' => '8:05 AM', 'end_formated' => '9:00 AM'],
+                ['start' => '09:05:00', 'end' => '10:00:00', 'start_formated' => '9:05 AM', 'end_formated' => '10:00 AM'],
+                ['start' => '10:05:00', 'end' => '11:00:00', 'start_formated' => '10:05 AM', 'end_formated' => '11:00 AM'],
+                ['start' => '11:05:00', 'end' => '12:00:00', 'start_formated' => '11:05 AM', 'end_formated' => '12:00 PM'],
+                ['start' => '12:05:00', 'end' => '13:00:00', 'start_formated' => '12:05 PM', 'end_formated' => '1:00 PM'],
+                ['start' => '13:05:00', 'end' => '14:00:00', 'start_formated' => '1:05 PM', 'end_formated' => '2:00 PM'],
+                ['start' => '14:05:00', 'end' => '15:00:00', 'start_formated' => '2:05 PM', 'end_formated' => '3:00 PM'],
+                ['start' => '15:00:00', 'end' => '15:55:00', 'start_formated' => '3:00 PM', 'end_formated' => '3:55 PM'],
+                ['start' => '15:55:00', 'end' => '16:50:00', 'start_formated' => '3:55 PM', 'end_formated' => '4:50 PM'],
+                ['start' => '16:50:00', 'end' => '17:45:00', 'start_formated' => '4:50 PM', 'end_formated' => '5:45 PM'],
+                ['start' => '17:45:00', 'end' => '18:40:00', 'start_formated' => '5:45 PM', 'end_formated' => '6:40 PM'],
+                ['start' => '18:40:00', 'end' => '19:35:00', 'start_formated' => '6:40 PM', 'end_formated' => '7:35 PM'],
+                ['start' => '20:05:00', 'end' => '21:00:00', 'start_formated' => '8:05 PM', 'end_formated' => '9:00 PM'],
+                ['start' => '21:05:00', 'end' => '22:00:00', 'start_formated' => '9:05 PM', 'end_formated' => '10:00 PM']
+            ];
+            $json->default_time = json_encode($defaultTimes);
+            $json->save();
+        }
+        $defaultTimes = json_decode($json->default_time);
+        // return response()->json($defaultTimes);
 
         $tabTypeData = $request->tab_type_data;
-        $groupsExists=[];
-        $roomsExists=[];
+        $groupsExists = [];
+        $roomsExists = [];
 
         $sessions = [];
 
 
-            $sessions = SessionTemplate::
-              where('id_template', $request->template_selected)
-            ->groupBy('start','end','id_group','day')
+        $sessions = SessionTemplate::
+            where('id_template', $request->template_selected)
+            ->groupBy('start', 'end', 'id_group', 'day')
             ->orderBy('id_group', 'asc')
             ->get();
 
@@ -117,23 +118,23 @@ class TemplateController extends Controller
 
         $groupsSession = [];
 
-        foreach ($sessions as $key =>   $session) {
+        foreach ($sessions as $key => $session) {
 
-                $groupTmp1=[];
+            $groupTmp1 = [];
 
-                // EMPLOYEE GROUP
-                $employeeGroupData=[];
+            // EMPLOYEE GROUP
+            $employeeGroupData = [];
 
-                $flagExist=false;
-                foreach ($groupsExists as $key => $group) {
-                    if($session->id_group==$group['id_group']){
-                        $flagExist=true;
-                        $employeeGroupData=$group;
-                    }
+            $flagExist = false;
+            foreach ($groupsExists as $key => $group) {
+                if ($session->id_group == $group['id_group']) {
+                    $flagExist = true;
+                    $employeeGroupData = $group;
                 }
+            }
 
-                if(!$flagExist){
-                    $employeeGroupData = Group::where('group.id', $session->id_group)
+            if (!$flagExist) {
+                $employeeGroupData = Group::where('group.id', $session->id_group)
                     ->leftJoin('employee', 'employee.id', '=', 'group.id_employee')
                     ->get([
                         'group.id as id_group',
@@ -145,55 +146,55 @@ class TemplateController extends Controller
                         'employee.name as name_employee',
                         'employee.last_name as last_name_employee'
                     ])->first();
-                    array_push($groupsExists, $employeeGroupData);
+                array_push($groupsExists, $employeeGroupData);
+            }
+            // ROOM GROUP
+            $flagExistRoom = false;
+            $roomTmp = [];
+            foreach ($roomsExists as $key => $room) {
+                if ($room->id == $employeeGroupData['group_room']) {
+                    $flagExistRoom = true;
+                    $roomTmp = $room;
                 }
-                // ROOM GROUP
-                $flagExistRoom=false;
-                $roomTmp=[];
-                foreach ($roomsExists as $key => $room) {
-                    if($room->id==$employeeGroupData['group_room']){
-                        $flagExistRoom=true;
-                        $roomTmp=$room;
-                    }
-                }
-                if(!$flagExistRoom){
-                    $roomTmp = Room::where('id', $employeeGroupData['group_room'])->first();
-                    array_push($roomsExists, $roomTmp);
-                }
+            }
+            if (!$flagExistRoom) {
+                $roomTmp = Room::where('id', $employeeGroupData['group_room'])->first();
+                array_push($roomsExists, $roomTmp);
+            }
 
-                $flagAdd=false;
-                if(($roomTmp->type_room=='Máquina' || $roomTmp->type_room=='Suelo') && $tabTypeData=='pilates'){
-                    $flagAdd=true;
-                }else if($roomTmp->type_room == 'Camilla' && $tabTypeData=='physiotherapy'){
-                    $flagAdd=true;
-                }else if($tabTypeData=='all'){
-                    $flagAdd=true;
-                }
+            $flagAdd = false;
+            if (($roomTmp->type_room == 'Máquina' || $roomTmp->type_room == 'Suelo') && $tabTypeData == 'pilates') {
+                $flagAdd = true;
+            } else if ($roomTmp->type_room == 'Camilla' && $tabTypeData == 'physiotherapy') {
+                $flagAdd = true;
+            } else if ($tabTypeData == 'all') {
+                $flagAdd = true;
+            }
 
-                if($flagAdd){
+            if ($flagAdd) {
 
-                $groupTmp1['id']= $employeeGroupData['id_group'];
-                $groupTmp1['id_num']= $employeeGroupData['id_group'];
-                $groupTmp1['id_group']= $employeeGroupData['id_group'];
-                $groupTmp1['name']= $employeeGroupData['name_group'];
-                $groupTmp1['level']= $employeeGroupData['level_group'];
+                $groupTmp1['id'] = $employeeGroupData['id_group'];
+                $groupTmp1['id_num'] = $employeeGroupData['id_group'];
+                $groupTmp1['id_group'] = $employeeGroupData['id_group'];
+                $groupTmp1['name'] = $employeeGroupData['name_group'];
+                $groupTmp1['level'] = $employeeGroupData['level_group'];
 
                 //employee
-                $groupTmp1['name_employee']= $employeeGroupData['name_employee'];
-                $groupTmp1['last_name_employee']= $employeeGroupData['last_name_employee'];
+                $groupTmp1['name_employee'] = $employeeGroupData['name_employee'];
+                $groupTmp1['last_name_employee'] = $employeeGroupData['last_name_employee'];
                 //end employee
-                $groupTmp1['observation']=$employeeGroupData['observations_group'];
-                $groupTmp1['actions']= $employeeGroupData['id_group'];
+                $groupTmp1['observation'] = $employeeGroupData['observations_group'];
+                $groupTmp1['actions'] = $employeeGroupData['id_group'];
                 //room
-                $groupTmp1['room_id']= $roomTmp->id;
-                $groupTmp1['room_name']= $roomTmp->name;
-                $groupTmp1['type_room']= $roomTmp->type_room;
+                $groupTmp1['room_id'] = $roomTmp->id;
+                $groupTmp1['room_name'] = $roomTmp->name;
+                $groupTmp1['type_room'] = $roomTmp->type_room;
                 //sessions
-                $groupTmp1['time_start']=  $session->start;
-                $groupTmp1['time_end']=  $session->end;
-                $groupTmp1['day']=  $session->day;
+                $groupTmp1['time_start'] = $session->start;
+                $groupTmp1['time_end'] = $session->end;
+                $groupTmp1['day'] = $session->day;
 
-                $status = Pilates::getRealStatusGroupByNumFormatTemplate($employeeGroupData['id_group'],$roomTmp,$session->start, $session->end,$session->day,$request->template_selected);
+                $status = Pilates::getRealStatusGroupByNumFormatTemplate($employeeGroupData['id_group'], $roomTmp, $session->start, $session->end, $session->day, $request->template_selected);
                 $groupTmp1['status'] = $status['num'];
                 $groupTmp1['status_format'] = $status['format'];
 
@@ -205,34 +206,36 @@ class TemplateController extends Controller
                     'time_end' => $session->end,
                     'time_end_for_short' => $session->end,
                     'day' => $session->day,
-                    'is_default' =>false,
-                    'status_employee'=> false//($employeeGroupData['id_employee']!=null)? Pilates::getStatusEmployeeGroupBySessionGroup($employeeGroupData['id_employee'],$session->start,$session->end,false):false
+                    'is_default' => false,
+                    'status_employee' => false//($employeeGroupData['id_employee']!=null)? Pilates::getStatusEmployeeGroupBySessionGroup($employeeGroupData['id_employee'],$session->start,$session->end,false):false
                 ]);
-                }
+            }
 
         }
 
 
         foreach ($defaultTimes as $key => $defaultTime) {
-            $flagExist=false;
+            $flagExist = false;
 
-            $startDefault=$defaultTime->start;
-            $endDefault=$defaultTime->end;
+            $startDefault = $defaultTime->start;
+            $endDefault = $defaultTime->end;
 
             foreach ($groupsSession as $key => $groupSession) {
-            if($startDefault==$groupSession['time_start'] && $endDefault==$groupSession['time_end'])$flagExist=true;
+                if ($startDefault == $groupSession['time_start'] && $endDefault == $groupSession['time_end'])
+                    $flagExist = true;
             }
-            if(!$flagExist)array_push($groupsSession, [
-                'time_start' => $startDefault,
-                'time_end' => $endDefault,
-                'time_end_for_short' => $endDefault,
-                'day' => null,
-                'is_default' =>true
-            ]);
+            if (!$flagExist)
+                array_push($groupsSession, [
+                    'time_start' => $startDefault,
+                    'time_end' => $endDefault,
+                    'time_end_for_short' => $endDefault,
+                    'day' => null,
+                    'is_default' => true
+                ]);
         }
 
         $groupsSession = collect($groupsSession)->sortBy('time_end_for_short', SORT_NATURAL | SORT_FLAG_CASE, false)->values()->all();
-        $resData=['groups'=>$groupsSession,'template'=> Template::where('id',$request->template_selected)->first() ];
+        $resData = ['groups' => $groupsSession, 'template' => Template::where('id', $request->template_selected)->first()];
 
         return response()->json($resData);
     }
@@ -266,16 +269,16 @@ class TemplateController extends Controller
 
 
         $isSame = true;
-        if ($request->timepicker_start == $request->timepicker_start_previous && $request->timepicker_end == $request->timepicker_end_previous &&  $request->day==$request->day_previous ) {
+        if ($request->timepicker_start == $request->timepicker_start_previous && $request->timepicker_end == $request->timepicker_end_previous && $request->day == $request->day_previous) {
             $rules['id_group'] = 'required';
         } else {
             $isSame = false;
             $rules['id_group'] = [
                 'required',
                 //new RuleEmployeeDuplicateSessionTime2( $request->date_start . ' ' . $request->timepicker_start,$request->date_start . ' ' . $request->timepicker_end,$request->id_group),
-                new RuleDuplicateGroupSessionsTemplate($request->id_group,  $request->timepicker_start, $request->timepicker_end,$request->id_template,$request->day),
-                new RuleRoomCrashTemplate($request->id_group, $request->timepicker_start, $request->timepicker_end,$request->id_template,$request->day),
-                new RuleDuplicateSessionClientGroupTemplate($request->id_template,$request->id_group,$request->timepicker_start_previous,$request->timepicker_end_previous,$request->day_previous,$request->timepicker_start,$request->timepicker_end,$request->day)
+                new RuleDuplicateGroupSessionsTemplate($request->id_group, $request->timepicker_start, $request->timepicker_end, $request->id_template, $request->day),
+                new RuleRoomCrashTemplate($request->id_group, $request->timepicker_start, $request->timepicker_end, $request->id_template, $request->day),
+                new RuleDuplicateSessionClientGroupTemplate($request->id_template, $request->id_group, $request->timepicker_start_previous, $request->timepicker_end_previous, $request->day_previous, $request->timepicker_start, $request->timepicker_end, $request->day)
             ];
         }
 
@@ -300,15 +303,15 @@ class TemplateController extends Controller
 
             if (!$isSame) {
                 $sessions = SessionTemplate::
-                      where('start',  $request->timepicker_start_previous)
-                    ->where('end',  $request->timepicker_end_previous)
+                    where('start', $request->timepicker_start_previous)
+                    ->where('end', $request->timepicker_end_previous)
                     ->where('id_group', $request->id_group)
                     ->where('day', $request->day_previous)
                     ->where('id_template', $request->id_template)
                     ->get();
 
                 foreach ($sessions as $key => $session) {
-                SessionTemplate::where('id', $session->id)->update(['start' => $request->timepicker_start, 'end' => $request->timepicker_end, 'day'=>$request->day]);
+                    SessionTemplate::where('id', $session->id)->update(['start' => $request->timepicker_start, 'end' => $request->timepicker_end, 'day' => $request->day]);
                 }
             }
 
@@ -332,18 +335,18 @@ class TemplateController extends Controller
 
 
         $isSame = true;
-        if ($request->timepicker_start == $request->timepicker_start_previous && $request->timepicker_end == $request->timepicker_end_previous &&  $request->day==$request->day_previous && $request->id_group_previous==$request->id_group) {
+        if ($request->timepicker_start == $request->timepicker_start_previous && $request->timepicker_end == $request->timepicker_end_previous && $request->day == $request->day_previous && $request->id_group_previous == $request->id_group) {
             $rules['id_group'] = 'required';
         } else {
             $isSame = false;
             $rules['id_group'] = [
                 'required',
                 //new RuleEmployeeDuplicateSessionTime2( $request->date_start . ' ' . $request->timepicker_start,$request->date_start . ' ' . $request->timepicker_end,$request->id_group),
-                new RuleDuplicateGroupSessionsTemplate($request->id_group,  $request->timepicker_start, $request->timepicker_end,$request->id_template,$request->day),
-                new RuleRoomCrashTemplate($request->id_group_previous, $request->timepicker_start, $request->timepicker_end,$request->id_template,$request->day),
-                new sameTypeRoomGroup($request->id_group_previous,$request->id_group),
-                new RuleSufficientCapacityRoomGroupTemplate( $request->timepicker_start_previous, $request->timepicker_end_previous,$request->id_group_previous,$request->id_group,$request->id_template,$request->day_previous),
-                new RuleDuplicateSessionClientGroupTemplate($request->id_template,$request->id_group_previous,$request->timepicker_start_previous,$request->timepicker_end_previous,$request->day_previous,$request->timepicker_start,$request->timepicker_end,$request->day)
+                new RuleDuplicateGroupSessionsTemplate($request->id_group, $request->timepicker_start, $request->timepicker_end, $request->id_template, $request->day),
+                new RuleRoomCrashTemplate($request->id_group_previous, $request->timepicker_start, $request->timepicker_end, $request->id_template, $request->day),
+                new sameTypeRoomGroup($request->id_group_previous, $request->id_group),
+                new RuleSufficientCapacityRoomGroupTemplate($request->timepicker_start_previous, $request->timepicker_end_previous, $request->id_group_previous, $request->id_group, $request->id_template, $request->day_previous),
+                new RuleDuplicateSessionClientGroupTemplate($request->id_template, $request->id_group_previous, $request->timepicker_start_previous, $request->timepicker_end_previous, $request->day_previous, $request->timepicker_start, $request->timepicker_end, $request->day)
             ];
         }
 
@@ -367,19 +370,19 @@ class TemplateController extends Controller
 
 
 
-                if (!$isSame) {
-                    $sessions = SessionTemplate::
-                          where('start',  $request->timepicker_start_previous)
-                        ->where('end',  $request->timepicker_end_previous)
-                        ->where('id_group', $request->id_group_previous)
-                        ->where('day', $request->day_previous)
-                        ->where('id_template', $request->id_template)
-                        ->get();
+            if (!$isSame) {
+                $sessions = SessionTemplate::
+                    where('start', $request->timepicker_start_previous)
+                    ->where('end', $request->timepicker_end_previous)
+                    ->where('id_group', $request->id_group_previous)
+                    ->where('day', $request->day_previous)
+                    ->where('id_template', $request->id_template)
+                    ->get();
 
-                    foreach ($sessions as $key => $session) {
-                    SessionTemplate::where('id', $session->id)->update(['start' => $request->timepicker_start, 'end' => $request->timepicker_end, 'day'=>$request->day,'id_group'=>$request->id_group]);
-                    }
+                foreach ($sessions as $key => $session) {
+                    SessionTemplate::where('id', $session->id)->update(['start' => $request->timepicker_start, 'end' => $request->timepicker_end, 'day' => $request->day, 'id_group' => $request->id_group]);
                 }
+            }
 
 
             return response()->json(['success' => 'Actualización realizada correctamente.', 'error' => false]);
@@ -388,42 +391,43 @@ class TemplateController extends Controller
         }
     }
 
-    public function moveSessions(Request $request){
-        $cantSessions=(!empty($request->input('sessions_selected')))?count($request->input('sessions_selected')):0;
+    public function moveSessions(Request $request)
+    {
+        $cantSessions = (!empty($request->input('sessions_selected'))) ? count($request->input('sessions_selected')) : 0;
         $dateStart = DateTime::createFromFormat('H:i:s', $request->timepicker_start)->format('H:i');
         $dateEnd = DateTime::createFromFormat('H:i:s', $request->timepicker_end)->format('H:i');
         $rules = [
 
-            'id_group'  => [
+            'id_group' => [
                 'required',
                 'required_with:sessions_selected',
-                new RuleEmptyGroupTemplate($request->id_group, $dateStart, $dateEnd, $cantSessions,$request->day,$request->id_template),
+                new RuleEmptyGroupTemplate($request->id_group, $dateStart, $dateEnd, $cantSessions, $request->day, $request->id_template),
 
             ],
             'sessions_selected' => [
                 'required',
-                new RuleSessionSameTypeTemplate($request->id_group,$request->input('sessions_selected')[0])
+                new RuleSessionSameTypeTemplate($request->id_group, $request->input('sessions_selected')[0])
             ]
         ];
 
         if (!empty($request->input('sessions_selected'))) {
-            $sessionsSelected =  $request->input('sessions_selected');
+            $sessionsSelected = $request->input('sessions_selected');
 
-            if(count($sessionsSelected)>0){
-             $tmpSession=  SessionTemplate::where('id',$sessionsSelected[0])->first();
-             SessionTemplate::create([
-                'id_group' =>$tmpSession->id_group,
-                'id_client' => null,
-                'id_template' => $tmpSession->id_template,
-                'day' =>$tmpSession->day,
-                'start' => $tmpSession->start,
-                'end' => $tmpSession->end,
-                'observation' => $tmpSession->observation
-            ]);
+            if (count($sessionsSelected) > 0) {
+                $tmpSession = SessionTemplate::where('id', $sessionsSelected[0])->first();
+                SessionTemplate::create([
+                    'id_group' => $tmpSession->id_group,
+                    'id_client' => null,
+                    'id_template' => $tmpSession->id_template,
+                    'day' => $tmpSession->day,
+                    'start' => $tmpSession->start,
+                    'end' => $tmpSession->end,
+                    'observation' => $tmpSession->observation
+                ]);
             }
             foreach ($sessionsSelected as $key => $sessionSelected) {
                 $rules["sessions_selected.$key"] = [
-                    new RuleDuplicateSessionSameGroupTemplate($request->id_group,$request->timepicker_start,$request->timepicker_end,$sessionSelected,$request->day,$request->id_template)
+                    new RuleDuplicateSessionSameGroupTemplate($request->id_group, $request->timepicker_start, $request->timepicker_end, $sessionSelected, $request->day, $request->id_template)
                 ];
             }
         }
@@ -438,13 +442,13 @@ class TemplateController extends Controller
             if ($validator->passes()) {
 
 
-            $sessions =  $request->input('sessions_selected');
+                $sessions = $request->input('sessions_selected');
 
-            foreach ($sessions as $key => $session) {
-            SessionTemplate::where('id',$session)->update(['start'=>$request->timepicker_start,'end'=>$request->timepicker_end,'id_group'=>$request->id_group,'day'=>$request->day]);
-            }
-            $countSession=count($sessions);
-                return response()->json(['response' => ($countSession>1)?"$countSession sesiones movidas con éxito.":"$countSession sesión movida con éxito.", 'status' => true]);
+                foreach ($sessions as $key => $session) {
+                    SessionTemplate::where('id', $session)->update(['start' => $request->timepicker_start, 'end' => $request->timepicker_end, 'id_group' => $request->id_group, 'day' => $request->day]);
+                }
+                $countSession = count($sessions);
+                return response()->json(['response' => ($countSession > 1) ? "$countSession sesiones movidas con éxito." : "$countSession sesión movida con éxito.", 'status' => true]);
             } else {
                 return response()->json(['response' => $validator->errors()->all(), 'status' => false]);
             }
@@ -478,7 +482,8 @@ class TemplateController extends Controller
 
                 $template = Template::create(['name' => $request->name, 'status' => 'false']);
 
-                  /*auditoria: start*/Pilates::setAudit("Alta plantilla id: $template->id"); /*auditoria: end*/
+                /*auditoria: start*/
+                Pilates::setAudit("Alta plantilla id: $template->id"); /*auditoria: end*/
                 return response()->json(['response' => 'Plantilla creada con éxito.', 'status' => true, 'data' => $template]);
             } else {
                 return response()->json(['response' => $validator->errors()->all(), 'status' => false, 'data' => []]);
@@ -495,11 +500,11 @@ class TemplateController extends Controller
     public function storeGroupSession(Request $request)
     {
 
-        $cantClients=(!empty($request->input('clients_selected')))?count($request->input('clients_selected')):0;
+        $cantClients = (!empty($request->input('clients_selected'))) ? count($request->input('clients_selected')) : 0;
         $rules = [
             'serie_days_selected' => 'required',
             'id_template' => 'required',
-            'group_selected'  => [
+            'group_selected' => [
                 'required',
                 'required_with:clients_selected'
             ],
@@ -513,26 +518,26 @@ class TemplateController extends Controller
         if (!empty($request->input('group_selected'))) {
 
 
-            if(!empty($request->input('serie_days_selected'))){
+            if (!empty($request->input('serie_days_selected'))) {
                 $daysSelected = $request->input('serie_days_selected');
                 foreach ($daysSelected as $key => $serieDay) {
                     $rules["serie_days_selected.$key"] = [
-                        new RuleEmptyGroupTemplate($request->group_selected['id_group'], $request->timepicker_start,$request->timepicker_end, $cantClients,$serieDay,$request->id_template),
-                        new RuleDuplicateGroupSessionsTemplate($request->group_selected['id_group'], $request->timepicker_start,$request->timepicker_end,$request->id_template,$serieDay),
-                        new RuleRoomCrashTemplate($request->group_selected['id_group'], $request->timepicker_start, $request->timepicker_end,$request->id_template,$serieDay)
+                        new RuleEmptyGroupTemplate($request->group_selected['id_group'], $request->timepicker_start, $request->timepicker_end, $cantClients, $serieDay, $request->id_template),
+                        new RuleDuplicateGroupSessionsTemplate($request->group_selected['id_group'], $request->timepicker_start, $request->timepicker_end, $request->id_template, $serieDay),
+                        new RuleRoomCrashTemplate($request->group_selected['id_group'], $request->timepicker_start, $request->timepicker_end, $request->id_template, $serieDay)
                     ];
                 }
             }
 
             if (!empty($request->input('clients_selected')) && !empty($request->input('serie_days_selected'))) {
-                $clients =  $request->input('clients_selected');
+                $clients = $request->input('clients_selected');
                 foreach ($daysSelected as $key => $serieDay) {
-                foreach ($clients as $key => $client) {
-                    $rules["clients_selected.$key.id"] = [
-                        new RuleDuplicatesSessionClientTemplate($request->group_selected['id_group'], $request->timepicker_start,$request->timepicker_end,  $client['id'], "$client[name] $client[last_name]",$request->id_template,$serieDay)
-                    ];
+                    foreach ($clients as $key => $client) {
+                        $rules["clients_selected.$key.id"] = [
+                            new RuleDuplicatesSessionClientTemplate($request->group_selected['id_group'], $request->timepicker_start, $request->timepicker_end, $client['id'], "$client[name] $client[last_name]", $request->id_template, $serieDay)
+                        ];
+                    }
                 }
-            }
             }
 
 
@@ -578,26 +583,26 @@ class TemplateController extends Controller
                 // }
                 $dateStart = DateTime::createFromFormat('H:i', $dateStart)->format('H:i:s');
                 $dateEnd = DateTime::createFromFormat('H:i', $dateEnd)->format('H:i:s');
-                $template = Template::where('id',$request->id_template)->first();
+                $template = Template::where('id', $request->id_template)->first();
                 $template_json = json_decode($template->default_time);
                 $count_exists = 0;
                 $array_json = [];
                 foreach ($template_json as $key_json => $value_json) {
-                  if ($value_json->start == $dateStart && $value_json->end == $dateEnd ) {
-                    $count_exists += 1;
-                  }
-                  $array_json [] = $value_json;
+                    if ($value_json->start == $dateStart && $value_json->end == $dateEnd) {
+                        $count_exists += 1;
+                    }
+                    $array_json[] = $value_json;
                 }
                 $new_data_json = [];
                 if ($count_exists == 0) {
-                  $new_data_json [] = [
-                    "start" => $dateStart,
-                    "end" => $dateEnd,
-                    "start_formated" => date('h:i A', strtotime($dateStart)),
-                    "end_formated" => date('h:i A', strtotime($dateEnd)),
+                    $new_data_json[] = [
+                        "start" => $dateStart,
+                        "end" => $dateEnd,
+                        "start_formated" => date('h:i A', strtotime($dateStart)),
+                        "end_formated" => date('h:i A', strtotime($dateEnd)),
                     ];
-                $json_final = array_merge($array_json,$new_data_json);
-                $template->default_time = json_encode($json_final);
+                    $json_final = array_merge($array_json, $new_data_json);
+                    $template->default_time = json_encode($json_final);
                 }
 
                 // return response()->json([$dateStart, $dateEnd, $count_exists,$new_data_json,gettype($json_final),$json_final]);
@@ -605,7 +610,7 @@ class TemplateController extends Controller
                 $daysSelected = $request->input('serie_days_selected');
 
                 if (!empty($request->input('clients_selected'))) {
-                    $clients =  $request->input('clients_selected');
+                    $clients = $request->input('clients_selected');
                     foreach ($daysSelected as $key => $serieDay) {
                         foreach ($clients as $key => $client) {
 
@@ -648,57 +653,62 @@ class TemplateController extends Controller
                         }
 
                         //nulled session
-                        SessionTemplate::create([
-                            'id_group' => $request->group_selected['id_group'],
-                            'id_client' => null,
-                            'id_template' => $request->id_template,
-                            'day' => $serieDay,
-                            'start' => $dateStart,
-                            'end' => $dateEnd,
-                            'observation' => $request->observation
-                        ]);
 
                         //
                     }
+                    // !verificar si crea aqui o en otro lado
+                    Log::info('Se ha creado una sesión con cliente con saldo positivo');
+                    SessionTemplate::create([
+                        'id_group' => $request->group_selected['id_group'],
+                        'id_client' => null,
+                        'id_template' => $request->id_template,
+                        'day' => $serieDay,
+                        'start' => $dateStart,
+                        'end' => $dateEnd,
+                        'observation' => $request->observation
+                    ]);
 
                 } else {
-
+                    Log::info('Se ha creado una sesión con cliente con saldo negativo');
                     foreach ($daysSelected as $key => $serieDay) {
-
-                                if ($groupRoom->type_room == 'Máquina') {
-                                    SessionTemplate::create([
-                                        'id_group' => $request->group_selected['id_group'],
-                                        'id_client' => null,
-                                        'id_template' => $request->id_template,
-                                        'day' => $serieDay,
-                                        'start' => $dateStart,
-                                        'end' => $dateEnd,
-                                        'observation' => $request->observation,
-                                        'sessions_machine' => 0,
-                                    ]);
-                                } else if ($groupRoom->type_room == 'Suelo') {
-                                    SessionTemplate::create([
-                                        'id_group' => $request->group_selected['id_group'],
-                                        'id_client' => null,
-                                        'id_template' => $request->id_template,
-                                        'day' => $serieDay,
-                                        'start' => $dateStart,
-                                        'end' => $dateEnd,
-                                        'observation' => $request->observation,
-                                        'sessions_floor' => 0
-                                    ]);
-                                } else if ($groupRoom->type_room == 'Camilla') {
-                                    SessionTemplate::create([
-                                        'id_group' => $request->group_selected['id_group'],
-                                        'id_client' =>  null,
-                                        'id_template' => $request->id_template,
-                                        'day' => $serieDay,
-                                        'start' => $dateStart,
-                                        'end' => $dateEnd,
-                                        'observation' => $request->observation,
-                                        'sessions_individual' => 0
-                                    ]);
-                      }
+                        Log::info("Día: $serieDay");
+                        if ($groupRoom->type_room == 'Máquina') {
+                            Log::info("Máquina");
+                            SessionTemplate::create([
+                                'id_group' => $request->group_selected['id_group'],
+                                'id_client' => null,
+                                'id_template' => $request->id_template,
+                                'day' => $serieDay,
+                                'start' => $dateStart,
+                                'end' => $dateEnd,
+                                'observation' => $request->observation,
+                                'sessions_machine' => 0,
+                            ]);
+                        } else if ($groupRoom->type_room == 'Suelo') {
+                            Log::info("Suelo");
+                            SessionTemplate::create([
+                                'id_group' => $request->group_selected['id_group'],
+                                'id_client' => null,
+                                'id_template' => $request->id_template,
+                                'day' => $serieDay,
+                                'start' => $dateStart,
+                                'end' => $dateEnd,
+                                'observation' => $request->observation,
+                                'sessions_floor' => 0
+                            ]);
+                        } else if ($groupRoom->type_room == 'Camilla') {
+                            Log::info("Camilla");
+                            SessionTemplate::create([
+                                'id_group' => $request->group_selected['id_group'],
+                                'id_client' => null,
+                                'id_template' => $request->id_template,
+                                'day' => $serieDay,
+                                'start' => $dateStart,
+                                'end' => $dateEnd,
+                                'observation' => $request->observation,
+                                'sessions_individual' => 0
+                            ]);
+                        }
                     }
                 }
                 return response()->json(['success' => 'El grupo de sesiones se agrego con éxito.', 'error' => false]);
@@ -757,26 +767,26 @@ class TemplateController extends Controller
                 $dateStartOriginal = DateTime::createFromFormat('H:i', $dateStartOriginal)->format('H:i:s');
                 $dateEndOriginal = DateTime::createFromFormat('H:i', $dateEndOriginal)->format('H:i:s');
 
-                $template = Template::where('id',$request->id_template)->first();
+                $template = Template::where('id', $request->id_template)->first();
 
                 $template_json = json_decode($template->default_time);
 
                 // $count_exists = 0;
                 $array_json = [];
                 foreach ($template_json as $key_json => $value_json) {
-                  if ($value_json->start != $dateStartOriginal && $value_json->end != $dateEndOriginal ) {
-                    $array_json [] = $value_json;
-                  }
+                    if ($value_json->start != $dateStartOriginal && $value_json->end != $dateEndOriginal) {
+                        $array_json[] = $value_json;
+                    }
                 }
                 // $new_data_json = [];
                 // if ($count_exists == 0) {
-                  $new_data_json [] = [
+                $new_data_json[] = [
                     "start" => $dateStart,
                     "end" => $dateEnd,
                     "start_formated" => date('h:i A', strtotime($dateStart)),
                     "end_formated" => date('h:i A', strtotime($dateEnd)),
-                    ];
-                $json_final = array_merge($array_json,$new_data_json);
+                ];
+                $json_final = array_merge($array_json, $new_data_json);
                 // return response()->json(['success' => 'El horario se cambio con éxito.',
                 // 'json' => $json_final,
                 // 'data' => [$dateStart,$dateEnd,$dateStartOriginal,$dateEndOriginal ], 'error' => false]);
@@ -796,42 +806,47 @@ class TemplateController extends Controller
 
     public function storeNewSession(Request $request)
     {
-        $cantClients=(!empty($request->input('clients_selected')))?count($request->input('clients_selected')):0;
-
+        $cantClients = count($request->input('clients_selected', []));
         $date_start = DateTime::createFromFormat('H:i:s', $request->timepicker_start)->format('H:i');
         $date_end = DateTime::createFromFormat('H:i:s', $request->timepicker_end)->format('H:i');
+    
         $rules = [
-
-            'group_selected'  => [
+            'group_selected' => [
                 'required',
                 'required_with:clients_selected',
-                new RuleEmptyGroupTemplate($request->group_selected['id_group'],  $date_start ,$date_end, $cantClients,$request->day,$request->id_template),
+                new RuleEmptyGroupTemplate($request->group_selected['id_group'], $date_start, $date_end, $cantClients, $request->day, $request->id_template),
             ],
-            'day'   => 'required',
+            'day' => 'required',
             'timepicker_start' => 'required|date_format:"H:i:s"',
             'timepicker_end' => 'required|date_format:"H:i:s"|after:timepicker_start',
             'observation' => 'nullable|max:250',
-            'clients_selected' => 'required'
+            'clients_selected' => 'required|array'
         ];
-
-        if (!empty($request->input('group_selected'))) {
-            if (!empty($request->input('clients_selected'))) {
-                $clients =  $request->input('clients_selected');
-                foreach ($clients as $key => $client) {
-                    $rules["clients_selected.$key.id"] = [
-                        new RuleDuplicatesSessionClientTemplate($request->group_selected['id_group'], $date_start,$date_end,  $client['id'], "$client[name] $client[last_name]",$request->id_template,$request->day)
-                    ];
-                }
+    
+        if ($request->filled('group_selected') && $request->filled('clients_selected')) {
+            $clients = $request->input('clients_selected', []);
+            foreach ($clients as $key => $client) {
+                $rules["clients_selected.$key.id"] = [
+                    new RuleDuplicatesSessionClientTemplate(
+                        $request->group_selected['id_group'], 
+                        $date_start, 
+                        $date_end, 
+                        $client['id'], 
+                        "{$client['name']} {$client['last_name']}", 
+                        $request->id_template, 
+                        $request->day
+                    )
+                ];
             }
         }
-
+    
         $messages = [
             'group_selected.required' => 'Necesita seleccionar un grupo.',
             'clients_selected.required' => 'Necesita agregar al menos a un cliente.',
             'timepicker_end.after' => 'La hora final debe ser mayor que la hora inicial.',
             'group_selected.required_with' => 'Es necesario que elija un grupo.'
         ];
-
+    
         $customAttr = [
             'group_selected' => 'grupo',
             'day' => 'día',
@@ -839,61 +854,43 @@ class TemplateController extends Controller
             'timepicker_end' => 'hora de término',
             'observation' => 'observaciones'
         ];
-
-
-
+    
         $validator = Validator::make($request->all(), $rules, $messages, $customAttr);
-
+    
         if ($request->ajax()) {
-
             if ($validator->passes()) {
-
-                $groupRoom = Group::where("group.id", $request->group_selected['id_group'])->join('room', 'group.id_room', '=', 'room.id')->first();
-
-                $clients =  $request->input('clients_selected');
-
-                foreach ($clients as $key => $client) {
-
-
-                if ($groupRoom->type_room == 'Máquina') {
-
-                    SessionTemplate::create([
+                $groupRoom = Group::with('room')->find($request->group_selected['id_group']);
+                $clients = $request->input('clients_selected', []);
+    
+                foreach ($clients as $client) {
+                    $sessionData = [
                         'id_group' => $request->group_selected['id_group'],
-                        'id_client' =>  $client['id'] ?? null,
+                        'id_client' => $client['id'] ?? null,
                         'id_template' => $request->id_template,
                         'day' => $request->day,
                         'start' => $request->timepicker_start,
                         'end' => $request->timepicker_end,
-                        'observation' => $request->observation,
-                        'sessions_machine' => 1
-                    ]);
-                } else if ($groupRoom->type_room == 'Suelo') {
-                    SessionTemplate::create([
-                        'id_group' => $request->group_selected['id_group'],
-                        'id_client' =>  $client['id'] ?? null,
-                        'id_template' => $request->id_template,
-                        'day' => $request->day,
-                        'start' => $request->timepicker_start,
-                        'end' => $request->timepicker_end,
-                        'observation' => $request->observation,
-                        'sessions_floor' => 1
-                    ]);
-                } else if ($groupRoom->type_room == 'Camilla') {
-
-                    SessionTemplate::create([
-                        'id_group' => $request->group_selected['id_group'],
-                        'id_client' =>  $client['id'] ?? null,
-                        'id_template' => $request->id_template,
-                        'day' => $request->day,
-                        'start' => $request->timepicker_start,
-                        'end' => $request->timepicker_end,
-                        'observation' => $request->observation,
-                        'sessions_individual' => 1
-                    ]);
+                        'observation' => $request->observation
+                    ];
+    
+                    switch ($groupRoom->room->type_room) {
+                        case 'Máquina':
+                            $sessionData['sessions_machine'] = 1;
+                            break;
+                        case 'Suelo':
+                            $sessionData['sessions_floor'] = 1;
+                            break;
+                        case 'Camilla':
+                            $sessionData['sessions_individual'] = 1;
+                            break;
+                    }
+    
+                    SessionTemplate::create($sessionData);
                 }
-            }
-            $countClients=count($clients);
-                return response()->json(['success' => ($countClients>1)?"$countClients sesiones de cliente agregadas con éxito.":"$countClients sesión de cliente agregada con éxito.", 'error' => true]);
+    
+                $countClients = count($clients);
+                $message = ($countClients > 1) ? "$countClients sesiones de cliente agregadas con éxito." : "$countClients sesión de cliente agregada con éxito.";
+                return response()->json(['success' => $message, 'error' => false]);
             } else {
                 return response()->json(['success' => false, 'error' => $validator->errors()->all()]);
             }
@@ -901,7 +898,7 @@ class TemplateController extends Controller
             abort(404);
         }
     }
-
+    
 
     public function dataTableGroupCalendar(Request $request)
     {
@@ -931,9 +928,12 @@ class TemplateController extends Controller
             }
         }
 
-        $response = ['status' => true, 'response' => ($cantSuccsess <= 1) ?
-            $cantSuccsess . ' sesión eliminada con éxito' :
-            $cantSuccsess . ' sesiones eliminadas con éxito'];
+        $response = [
+            'status' => true,
+            'response' => ($cantSuccsess <= 1) ?
+                $cantSuccsess . ' sesión eliminada con éxito' :
+                $cantSuccsess . ' sesiones eliminadas con éxito'
+        ];
 
         return response()->json($response);
     }
@@ -943,13 +943,14 @@ class TemplateController extends Controller
 
 
         $status = false;
-        if (SessionTemplate::
-              where('id_group', $request->id_group)
-            ->where('start', '=', $request->timepicker_start)
-            ->where('end', '=', $request->timepicker_end)
-            ->where('id_template', '=', $request->id_template)
-            ->where('day', '=', $request->day)
-            ->delete()
+        if (
+            SessionTemplate::
+                where('id_group', $request->id_group)
+                ->where('start', '=', $request->timepicker_start)
+                ->where('end', '=', $request->timepicker_end)
+                ->where('id_template', '=', $request->id_template)
+                ->where('day', '=', $request->day)
+                ->delete()
         ) {
             $status = true;
         }
@@ -959,7 +960,8 @@ class TemplateController extends Controller
         return response()->json($response);
     }
 
-    function deleteTemplate(Request $request){
+    function deleteTemplate(Request $request)
+    {
         $rules = [
             'templates' => 'required',
         ];
@@ -989,15 +991,17 @@ class TemplateController extends Controller
                 $cantSuccsess . ' plantilla eliminada con éxito' :
                 $cantSuccsess . ' plantillas eliminadas con éxito';
 
-                   /*auditoria: start*/Pilates::setAudit("Baja plantilla ids: ".implode(', ', $idsSession)); /*auditoria: end*/
+            /*auditoria: start*/
+            Pilates::setAudit("Baja plantilla ids: " . implode(', ', $idsSession)); /*auditoria: end*/
 
             return response()->json(['response' => $response, 'status' => true]);
         } else {
-            return response()->json([ 'response' => $validator->errors()->all(),'status' => false]);
+            return response()->json(['response' => $validator->errors()->all(), 'status' => false]);
         }
     }
 
-    function enableDisableTemplate(Request $request){
+    function enableDisableTemplate(Request $request)
+    {
         $rules = [
             'template_selected' => 'required',
         ];
@@ -1013,39 +1017,42 @@ class TemplateController extends Controller
 
         if ($validator->passes()) {
 
-            $templates=Template::where('id','!=',$request->template_selected)->get();
+            $templates = Template::where('id', '!=', $request->template_selected)->get();
 
-            $updateToFalseTemplate=[];
+            $updateToFalseTemplate = [];
             foreach ($templates as $key => $template)
-            $updateToFalseTemplate[]=$template->id;
+                $updateToFalseTemplate[] = $template->id;
 
-            if(count($updateToFalseTemplate)>0)
-            Template::whereIn('id',$updateToFalseTemplate)->update(['status'=>'false']);
+            if (count($updateToFalseTemplate) > 0)
+                Template::whereIn('id', $updateToFalseTemplate)->update(['status' => 'false']);
 
 
-            $templateTmp=Template::where('id',$request->template_selected)->first();
-            $message="";
-            if($templateTmp->status=='false'){
-            $templateTmp->update(['status'=>'true']);
-              /*auditoria: start*/Pilates::setAudit("Activación plantilla id: $request->template_selected"); /*auditoria: end*/
-            $message="La plantilla ahora está activa.";
-            }else{
-             $templateTmp->update(['status'=>'false']);
-               /*auditoria: start*/Pilates::setAudit("Desactivación plantilla id: $request->template_selected"); /*auditoria: end*/
-             $message="La plantilla ahora está desactivada.";
+            $templateTmp = Template::where('id', $request->template_selected)->first();
+            $message = "";
+            if ($templateTmp->status == 'false') {
+                $templateTmp->update(['status' => 'true']);
+                /*auditoria: start*/
+                Pilates::setAudit("Activación plantilla id: $request->template_selected"); /*auditoria: end*/
+                $message = "La plantilla ahora está activa.";
+            } else {
+                $templateTmp->update(['status' => 'false']);
+                /*auditoria: start*/
+                Pilates::setAudit("Desactivación plantilla id: $request->template_selected"); /*auditoria: end*/
+                $message = "La plantilla ahora está desactivada.";
             }
 
 
-            return response()->json(['response' =>  $message, 'status' => true]);
+            return response()->json(['response' => $message, 'status' => true]);
         } else {
-            return response()->json([ 'response' => $validator->errors()->all(),'status' => false]);
+            return response()->json(['response' => $validator->errors()->all(), 'status' => false]);
         }
     }
 
-    function renameTemplate(Request $request){
+    function renameTemplate(Request $request)
+    {
         $rules = [
             'template_selected' => 'required',
-            'name' => 'required|max:100|unique:template,name,'.$request->template_selected
+            'name' => 'required|max:100|unique:template,name,' . $request->template_selected
         ];
 
 
@@ -1059,14 +1066,15 @@ class TemplateController extends Controller
         ];
 
 
-        $validator = Validator::make($request->all(), $rules, $messages,$customAttr);
+        $validator = Validator::make($request->all(), $rules, $messages, $customAttr);
 
         if ($validator->passes()) {
-            Template::where('id',$request->template_selected)->update(['name'=>$request->name]);
-            /*auditoria: start*/Pilates::setAudit("Renombrar plantilla id: $request->template_selected"); /*auditoria: end*/
-            return response()->json(['response' =>  "El nombre ha sido cambiado.", 'status' => true]);
+            Template::where('id', $request->template_selected)->update(['name' => $request->name]);
+            /*auditoria: start*/
+            Pilates::setAudit("Renombrar plantilla id: $request->template_selected"); /*auditoria: end*/
+            return response()->json(['response' => "El nombre ha sido cambiado.", 'status' => true]);
         } else {
-            return response()->json([ 'response' => $validator->errors()->all(),'status' => false]);
+            return response()->json(['response' => $validator->errors()->all(), 'status' => false]);
         }
     }
 

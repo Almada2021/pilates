@@ -46,7 +46,6 @@ class RuleDuplicatesSessionClientTemplate implements Rule
         $dateStartn=DateTime::createFromFormat('H:i',$this->start)->format('H:i:s');
         $dateEndn=DateTime::createFromFormat('H:i', $this->end)->format('H:i:s');
 
-        //dd('start: '.$dateStartn.'end: '.$dateEndn.'id_group: '.$this->id_group.'id_template: '.$this->id_template.'id_client: '.$this->id_client.'day: '.$this->day);
 
         $sessions=SessionTemplate::
           where('day',$this->day)
