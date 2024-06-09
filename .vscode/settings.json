@@ -1,0 +1,7 @@
+{
+    "[php]": {
+        "editor.linkedEditing": true,
+        "editor.formatOnSave": true,
+        "files.eol": "\n",
+    }
+}
