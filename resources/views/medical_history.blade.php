@@ -331,7 +331,7 @@
                                 <div class="d-flex justify-content-center align-items-center">
                                     <label for="img-change-back" data-toggle="kt-tooltip" data-placement="top"
                                         title="" data-original-title="Clic para cambiar">
-                                        <img id="preview-back-document" class="preview-document"
+                                        <img id="preview-back-document" class="preview-document" 
                                             src="{{ asset('assets') }}/images/doc-back-default.png" />
                                     </label>
 
@@ -345,17 +345,23 @@
                                 <div class="form-group form-group-last">
                                     <label for="observation">Observaciones</label>
                                     {{-- Text Area observations or notes --}}
-                                    <textarea class="form-control" name="observation" id="observation" rows="3"
-                                        style="margin-top: 0px; margin-bottom: 0px; height: 137px;">{{ old('observation') }}</textarea>
+                                    <textarea 
+                                        class="form-control" name="observation" id="observation" rows="3"
+                                        style="margin-top: 0px; margin-bottom: 0px; height: 40vh; resize:none;">{{ old('observation') }}</textarea>
                                 </div>
                             </div>
                         </div>
                     </div>
+                    <button id="speech"  class="btn btn-info rounded-full">
+                        <image 
+                            id="microphone-img"
+                            src="{{ asset('assets') }}/images/microphone.png" 
+                        />
+                    </button>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" class="close"
                             data-dismiss="modal">Cancelar</button>
                         <button type="submit" class="btn btn-primary">Agregar</button>
-                        <button id="speech"  class="btn btn-primary">grabar</button>
 
                     </div>
 
@@ -398,7 +404,8 @@
                                     <label for="img-change-front-edit" data-toggle="kt-tooltip" data-placement="top"
                                         title="" data-original-title="Clic para cambiar">
                                         <img id="preview-front-document-edit" class="preview-document"
-                                            src="{{ asset('assets') }}/images/doc-front-default.png" />
+                                            src="{{ asset('assets') }}/images/doc-front-default.png" 
+                                            />
                                     </label>
 
                                     <input type='file' id="img-change-front-edit" style="display:none" name="front"
@@ -649,7 +656,7 @@
 
 
 @section('js_page_vendors')
-    <script src="{{ asset("assets/$theme") }}/vendors/general/block-ui/jquery.blockUI.js" type="text/javascript"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/annyang/2.6.1/annyang.min.js" type="text/javascript"></script>    <script src="{{ asset("assets/$theme") }}/vendors/general/block-ui/jquery.blockUI.js" type="text/javascript"></script>
     <script src="{{ asset("assets/$theme") }}/vendors/general/bootstrap-select/dist/js/bootstrap-select.js"
         type="text/javascript"></script>
     <script src="{{ asset("assets/$theme") }}/vendors/custom/datatables/datatables.bundle.js" type="text/javascript">

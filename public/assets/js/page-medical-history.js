@@ -822,7 +822,7 @@ $(
     $("#modal_pass_compress_by_client").modal("hide");
     $("#modal_pass_compress_by_clients").modal("hide");
     $("#modal_compress_all").modal("hide");
-    hideOverlay();
+    // hideOverlay();
     return true;
 });
 
@@ -895,24 +895,12 @@ if ("webkitSpeechRecognition" in window) {
     var recognition = new webkitSpeechRecognition();
     recognition.continuous = true;
     recognition.interimResults = true;
-    navigator.mediaDevices
-        .getUserMedia({ audio: true })
-        .then(function (stream) {
-            // You have access to the microphone
-            console.log("Microphone access granted");
-            // You can now start speech recognition
-            recognition.start();
-        })
-        .catch(function (err) {
-            // Microphone access was denied or there was another error
-            console.error("Microphone access denied or error: " + err);
-        });
 
     recognition.onresult = function (event) {
         var textarea = document.getElementById("observation");
         for (var i = event.resultIndex; i < event.results.length; ++i) {
             if (event.results[i].isFinal) {
-                textarea.value += event.results[i][0].transcript;
+                textarea.value += event.results[i][0].transcript + " ";
             }
         }
     };
@@ -924,25 +912,53 @@ if ("webkitSpeechRecognition" in window) {
     var speechBtn = document.getElementById("speech");
     let checker = false;
     speechBtn.onclick = function (e) {
-        speechBtn.innerHTML= !checker ? "Escuchando..." : "Grabar"
-        // speechBtn.style.backgroundColor = "red";
-        checker = !checker;
         e.preventDefault();
-        navigator.mediaDevices
-            .getUserMedia({ audio: true })
-            .then(function (stream) {
-                // You have access to the microphone
-                console.log("Microphone access granted");
-                // You can now start speech recognition
-                recognition.start();
-            })
-            .catch(function (err) {
-                // Microphone access was denied or there was another error
-                console.error("Microphone access denied or error: " + err);
-            });
+        if (!checker) {
+            navigator.mediaDevices
+                .getUserMedia({ audio: true })
+                .then(function (stream) {
+                    // You have access to the microphone
+                    console.log("Microphone access granted");
+                    // You can now start speech recognition
+                    recognition.start();
+                })
+                .catch(function (err) {
+                    // Microphone access was denied or there was another error
+                    console.error("Microphone access denied or error: " + err);
+                });
+            speechBtn.innerHTML = "Escuchando...";
+        } else {
+            // Stop speech recognition
+            recognition.stop();
+            speechBtn.innerHTML = "Grabar";
+        }
+        checker = !checker;
+    };
+} else if (annyang) {
+    // Use annyang if webkitSpeechRecognition is not available
+    var commands = {
+        '*text': function(text) {
+            var textarea = document.getElementById("observation");
+            textarea.value += text + " ";
+        }
+    };
+// configure annyang for spanish
+
+    annyang.addCommands(commands);
+
+    var speechBtn = document.getElementById("speech");
+    let checker = false;
+    speechBtn.onclick = function (e) {
+        e.preventDefault();
+        if (!checker) {
+            annyang.start();
+            speechBtn.innerHTML = "Escuchando...";
+        } else {
+            annyang.stop();
+            speechBtn.innerHTML = "Grabar";
+        }
+        checker = !checker;
     };
 } else {
-    alert(
-        "Your browser does not support the Speech Recognition API. Please use a compatible browser like Google Chrome."
-    );
+    alert("Su navegador no soporta la API de reconocimiento de voz. Por favor use un navegador compatible como Google Chrome.");
 }
