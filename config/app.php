@@ -68,7 +68,7 @@ return [
     |
     */
 
-    'timezone' => env('UTC_PILATES','Atlantic/Canary'),
+    'timezone' => env('APP_TIMEZONE', 'UTC'),
     //mexico: America/Mexico_City
     //spain:Europe/Madrid
     'timezone_for_pilates'  => env('UTC_PILATES','Atlantic/Canary'),

@@ -1,0 +1,55 @@
+[2024-06-17 18:03:32] production.INFO: {"_token":"RP1Ij8jle0arCKiFKtkBUVUDCbf1v45tnA4RvGFy","_method":"PUT","delete_back":"false","delete_front":"false","id":"78","name_document":"1","observation":null,"front":{},"back":{}}  
+[2024-06-17 18:03:57] production.INFO: {"_token":"RP1Ij8jle0arCKiFKtkBUVUDCbf1v45tnA4RvGFy","_method":"PUT","delete_back":"false","delete_front":"false","id":"78","name_document":"1","observation":null,"back":{}}  
+[2024-06-17 18:08:37] production.INFO: {"_token":"RP1Ij8jle0arCKiFKtkBUVUDCbf1v45tnA4RvGFy","_method":"PUT","delete_back":"true","delete_front":"false","id":"78","name_document":"1","observation":null}  
+[2024-06-17 18:08:44] production.INFO: {"_token":"RP1Ij8jle0arCKiFKtkBUVUDCbf1v45tnA4RvGFy","_method":"PUT","delete_back":"true","delete_front":"true","id":"78","name_document":"1","observation":null}  
+[2024-06-17 18:28:51] production.INFO: generated  
+[2024-06-17 18:39:57] production.INFO: {"_token":"RP1Ij8jle0arCKiFKtkBUVUDCbf1v45tnA4RvGFy","_method":"PUT","delete_back":"false","delete_front":"true","id":"79","name_document":"1","observation":"1"}  
+[2024-06-17 18:41:07] production.INFO: {"_token":"RP1Ij8jle0arCKiFKtkBUVUDCbf1v45tnA4RvGFy","_method":"PUT","delete_back":"false","delete_front":"false","id":"79","name_document":"1","observation":"1","front":{}}  
+[2024-06-17 18:41:57] production.INFO: {"_token":"RP1Ij8jle0arCKiFKtkBUVUDCbf1v45tnA4RvGFy","_method":"PUT","delete_back":"false","delete_front":"true","id":"79","name_document":"1","observation":"1"}  
+[2024-06-17 18:47:13] production.INFO: {"_token":"RP1Ij8jle0arCKiFKtkBUVUDCbf1v45tnA4RvGFy","_method":"PUT","delete_back":"false","delete_front":"false","id":"79","name_document":"12","observation":"1"}  
+[2024-06-17 18:47:34] production.INFO: {"_token":"RP1Ij8jle0arCKiFKtkBUVUDCbf1v45tnA4RvGFy","_method":"PUT","delete_back":"false","delete_front":"false","id":"79","name_document":"12","observation":"1","front":{}}  
+[2024-06-17 18:47:41] production.INFO: {"_token":"RP1Ij8jle0arCKiFKtkBUVUDCbf1v45tnA4RvGFy","_method":"PUT","delete_back":"false","delete_front":"true","id":"79","name_document":"12","observation":"1"}  
+[2024-06-17 19:08:08] production.INFO: {"_token":"Wo62aH88r2lBoDfkFI2OjSONiVi1BEIf9f0jECVT","_method":"PUT","delete_back":"false","delete_front":"true","id":"78","name_document":"1","observation":null}  
+[2024-06-17 19:09:29] production.INFO: {"_token":"Wo62aH88r2lBoDfkFI2OjSONiVi1BEIf9f0jECVT","_method":"PUT","delete_back":"true","delete_front":"true","id":null,"name_document":"test1","observation":"adadqqwdeqwd
+
+qdqdw
+
+qwd
+
+
+
+q
+
+qwdqwdqwd
+
+
+
+
+
+qwdqwd
+
+qwd"}  
+[2024-06-17 19:09:41] production.INFO: {"_token":"Wo62aH88r2lBoDfkFI2OjSONiVi1BEIf9f0jECVT","_method":"PUT","delete_back":"true","delete_front":"true","id":null,"name_document":"test1","observation":"adadqqwdeqwd
+
+qdqdw
+
+qwd
+
+
+
+q
+
+qwdqwdqwd
+
+
+
+
+
+qwdqwd
+
+qwd"}  
+[2024-06-17 19:12:34] production.INFO: {"_token":"Wo62aH88r2lBoDfkFI2OjSONiVi1BEIf9f0jECVT","_method":"PUT","delete_back":"false","delete_front":"false","id":null,"name_document":"test2","observation":"asdads
+
+adsads
+
+asdasd","front":{},"back":{}}  

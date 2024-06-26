@@ -31,7 +31,7 @@ Route::get('password/reset/{token}', 'Auth\EmployeeResetPasswordController@showR
 Route::get('pdf/{id}/{id2}', 'PdfController@invoice');
 Route::get('print_php_info', 'PdfController@printPhp');
 
-Route::group(['prefix' => '/', 'middleware' => ['auth','twofactor', 'enable_employee', 'rol.permission']], function () {
+Route::group(['prefix' => '/', 'middleware' => ['auth', 'twofactor','enable_employee', 'rol.permission']], function () {
 
 
 
@@ -240,6 +240,7 @@ Route::group(['prefix' => '/', 'middleware' => ['auth','twofactor', 'enable_empl
     //auditorias
     Route::get('audit', 'AuditController@index')->name('audit');
     Route::post('audit/downlaod', 'AuditController@download')->name('audit_download');//
+    //register
     Route::get('register', function () {
         return redirect('/');
     });
@@ -247,7 +248,9 @@ Route::group(['prefix' => '/', 'middleware' => ['auth','twofactor', 'enable_empl
 
 
 
+
 });
 
 Auth::routes(['register' => false]);
+
 Route::get('/home', 'HomeController@index')->name('home');

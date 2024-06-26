@@ -284,7 +284,7 @@ class BillingController extends Controller
     $dompdf = $pdf->getDomPDF();
 
     $GLOBALS['bodyHeight'] = 0;
-    $dompdf->setCallbacks(
+   $dompdf->setCallbacks(
       array(
           'myCallbacks' => array(
               'event' => 'end_frame', 'f' => function ($frame) {
@@ -295,7 +295,7 @@ class BillingController extends Controller
               }
           )
       )
-  );
+    );
     $dompdf->render();
     unset($dompdf);
     $pdf = PDF::loadView('ticket/ticket1',  compact('productsSale', 'subtotal', 'totalDiscount', 'totalTaxes', 'totalAmount', 'config', 'sale', 'ticket'));

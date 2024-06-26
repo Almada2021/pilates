@@ -1,0 +1,216 @@
+[2024-06-18 12:41:21] laravel.EMERGENCY: Unable to create configured logger. Using emergency logger. {"exception":"[object] (InvalidArgumentException(code: 0): Log [] is not defined. at /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Log/LogManager.php:224)
+[stacktrace]
+#0 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(138): Illuminate\\Log\\LogManager->resolve()
+#1 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(125): Illuminate\\Log\\LogManager->get()
+#2 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(693): Illuminate\\Log\\LogManager->driver()
+#3 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(376): Illuminate\\Log\\LogManager->error()
+#4 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(337): Illuminate\\Foundation\\Exceptions\\Handler->reportThrowable()
+#5 /home/u238205865/domains/classerp.es/public_html/pilatessg/app/Exceptions/Handler.php(38): Illuminate\\Foundation\\Exceptions\\Handler->report()
+#6 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(497): App\\Exceptions\\Handler->report()
+#7 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(146): Illuminate\\Foundation\\Http\\Kernel->reportException()
+#8 /home/u238205865/domains/classerp.es/public_html/pilatessg/public/index.php(54): Illuminate\\Foundation\\Http\\Kernel->handle()
+#9 {main}
+"} 
+[2024-06-18 12:41:21] laravel.ERROR: syntax error, unexpected identifier "locale", expecting ")" {"exception":"[object] (ParseError(code: 0): syntax error, unexpected identifier \"locale\", expecting \")\" at /home/u238205865/domains/classerp.es/public_html/pilatessg/config/app.php:88)
+[stacktrace]
+#0 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(72): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->loadConfigurationFile()
+#1 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(39): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->loadConfigurationFiles()
+#2 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(309): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->bootstrap()
+#3 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(186): Illuminate\\Foundation\\Application->bootstrapWith()
+#4 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(170): Illuminate\\Foundation\\Http\\Kernel->bootstrap()
+#5 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(144): Illuminate\\Foundation\\Http\\Kernel->sendRequestThroughRouter()
+#6 /home/u238205865/domains/classerp.es/public_html/pilatessg/public/index.php(54): Illuminate\\Foundation\\Http\\Kernel->handle()
+#7 {main}
+"} 
+[2024-06-18 12:41:21] laravel.EMERGENCY: Unable to create configured logger. Using emergency logger. {"exception":"[object] (InvalidArgumentException(code: 0): Log [] is not defined. at /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Log/LogManager.php:224)
+[stacktrace]
+#0 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(138): Illuminate\\Log\\LogManager->resolve()
+#1 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(125): Illuminate\\Log\\LogManager->get()
+#2 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(693): Illuminate\\Log\\LogManager->driver()
+#3 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(376): Illuminate\\Log\\LogManager->error()
+#4 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(337): Illuminate\\Foundation\\Exceptions\\Handler->reportThrowable()
+#5 /home/u238205865/domains/classerp.es/public_html/pilatessg/app/Exceptions/Handler.php(38): Illuminate\\Foundation\\Exceptions\\Handler->report()
+#6 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(497): App\\Exceptions\\Handler->report()
+#7 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(146): Illuminate\\Foundation\\Http\\Kernel->reportException()
+#8 /home/u238205865/domains/classerp.es/public_html/pilatessg/public/index.php(54): Illuminate\\Foundation\\Http\\Kernel->handle()
+#9 {main}
+"} 
+[2024-06-18 12:41:21] laravel.ERROR: syntax error, unexpected identifier "locale", expecting ")" {"exception":"[object] (ParseError(code: 0): syntax error, unexpected identifier \"locale\", expecting \")\" at /home/u238205865/domains/classerp.es/public_html/pilatessg/config/app.php:88)
+[stacktrace]
+#0 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(72): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->loadConfigurationFile()
+#1 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(39): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->loadConfigurationFiles()
+#2 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(309): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->bootstrap()
+#3 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(186): Illuminate\\Foundation\\Application->bootstrapWith()
+#4 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(170): Illuminate\\Foundation\\Http\\Kernel->bootstrap()
+#5 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(144): Illuminate\\Foundation\\Http\\Kernel->sendRequestThroughRouter()
+#6 /home/u238205865/domains/classerp.es/public_html/pilatessg/public/index.php(54): Illuminate\\Foundation\\Http\\Kernel->handle()
+#7 {main}
+"} 
+[2024-06-18 12:41:23] laravel.EMERGENCY: Unable to create configured logger. Using emergency logger. {"exception":"[object] (InvalidArgumentException(code: 0): Log [] is not defined. at /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Log/LogManager.php:224)
+[stacktrace]
+#0 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(138): Illuminate\\Log\\LogManager->resolve()
+#1 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(125): Illuminate\\Log\\LogManager->get()
+#2 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(693): Illuminate\\Log\\LogManager->driver()
+#3 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(376): Illuminate\\Log\\LogManager->error()
+#4 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(337): Illuminate\\Foundation\\Exceptions\\Handler->reportThrowable()
+#5 /home/u238205865/domains/classerp.es/public_html/pilatessg/app/Exceptions/Handler.php(38): Illuminate\\Foundation\\Exceptions\\Handler->report()
+#6 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(497): App\\Exceptions\\Handler->report()
+#7 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(146): Illuminate\\Foundation\\Http\\Kernel->reportException()
+#8 /home/u238205865/domains/classerp.es/public_html/pilatessg/public/index.php(54): Illuminate\\Foundation\\Http\\Kernel->handle()
+#9 {main}
+"} 
+[2024-06-18 12:41:23] laravel.ERROR: syntax error, unexpected identifier "locale", expecting ")" {"exception":"[object] (ParseError(code: 0): syntax error, unexpected identifier \"locale\", expecting \")\" at /home/u238205865/domains/classerp.es/public_html/pilatessg/config/app.php:88)
+[stacktrace]
+#0 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(72): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->loadConfigurationFile()
+#1 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(39): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->loadConfigurationFiles()
+#2 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(309): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->bootstrap()
+#3 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(186): Illuminate\\Foundation\\Application->bootstrapWith()
+#4 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(170): Illuminate\\Foundation\\Http\\Kernel->bootstrap()
+#5 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(144): Illuminate\\Foundation\\Http\\Kernel->sendRequestThroughRouter()
+#6 /home/u238205865/domains/classerp.es/public_html/pilatessg/public/index.php(54): Illuminate\\Foundation\\Http\\Kernel->handle()
+#7 {main}
+"} 
+[2024-06-18 12:41:24] laravel.EMERGENCY: Unable to create configured logger. Using emergency logger. {"exception":"[object] (InvalidArgumentException(code: 0): Log [] is not defined. at /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Log/LogManager.php:224)
+[stacktrace]
+#0 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(138): Illuminate\\Log\\LogManager->resolve()
+#1 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(125): Illuminate\\Log\\LogManager->get()
+#2 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(693): Illuminate\\Log\\LogManager->driver()
+#3 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(376): Illuminate\\Log\\LogManager->error()
+#4 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(337): Illuminate\\Foundation\\Exceptions\\Handler->reportThrowable()
+#5 /home/u238205865/domains/classerp.es/public_html/pilatessg/app/Exceptions/Handler.php(38): Illuminate\\Foundation\\Exceptions\\Handler->report()
+#6 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(497): App\\Exceptions\\Handler->report()
+#7 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(146): Illuminate\\Foundation\\Http\\Kernel->reportException()
+#8 /home/u238205865/domains/classerp.es/public_html/pilatessg/public/index.php(54): Illuminate\\Foundation\\Http\\Kernel->handle()
+#9 {main}
+"} 
+[2024-06-18 12:41:24] laravel.ERROR: syntax error, unexpected identifier "locale", expecting ")" {"exception":"[object] (ParseError(code: 0): syntax error, unexpected identifier \"locale\", expecting \")\" at /home/u238205865/domains/classerp.es/public_html/pilatessg/config/app.php:88)
+[stacktrace]
+#0 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(72): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->loadConfigurationFile()
+#1 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(39): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->loadConfigurationFiles()
+#2 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(309): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->bootstrap()
+#3 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(186): Illuminate\\Foundation\\Application->bootstrapWith()
+#4 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(170): Illuminate\\Foundation\\Http\\Kernel->bootstrap()
+#5 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(144): Illuminate\\Foundation\\Http\\Kernel->sendRequestThroughRouter()
+#6 /home/u238205865/domains/classerp.es/public_html/pilatessg/public/index.php(54): Illuminate\\Foundation\\Http\\Kernel->handle()
+#7 {main}
+"} 
+[2024-06-18 12:41:25] laravel.EMERGENCY: Unable to create configured logger. Using emergency logger. {"exception":"[object] (InvalidArgumentException(code: 0): Log [] is not defined. at /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Log/LogManager.php:224)
+[stacktrace]
+#0 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(138): Illuminate\\Log\\LogManager->resolve()
+#1 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(125): Illuminate\\Log\\LogManager->get()
+#2 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(693): Illuminate\\Log\\LogManager->driver()
+#3 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(376): Illuminate\\Log\\LogManager->error()
+#4 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(337): Illuminate\\Foundation\\Exceptions\\Handler->reportThrowable()
+#5 /home/u238205865/domains/classerp.es/public_html/pilatessg/app/Exceptions/Handler.php(38): Illuminate\\Foundation\\Exceptions\\Handler->report()
+#6 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(497): App\\Exceptions\\Handler->report()
+#7 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(146): Illuminate\\Foundation\\Http\\Kernel->reportException()
+#8 /home/u238205865/domains/classerp.es/public_html/pilatessg/public/index.php(54): Illuminate\\Foundation\\Http\\Kernel->handle()
+#9 {main}
+"} 
+[2024-06-18 12:41:25] laravel.ERROR: syntax error, unexpected identifier "locale", expecting ")" {"exception":"[object] (ParseError(code: 0): syntax error, unexpected identifier \"locale\", expecting \")\" at /home/u238205865/domains/classerp.es/public_html/pilatessg/config/app.php:88)
+[stacktrace]
+#0 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(72): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->loadConfigurationFile()
+#1 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(39): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->loadConfigurationFiles()
+#2 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(309): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->bootstrap()
+#3 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(186): Illuminate\\Foundation\\Application->bootstrapWith()
+#4 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(170): Illuminate\\Foundation\\Http\\Kernel->bootstrap()
+#5 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(144): Illuminate\\Foundation\\Http\\Kernel->sendRequestThroughRouter()
+#6 /home/u238205865/domains/classerp.es/public_html/pilatessg/public/index.php(54): Illuminate\\Foundation\\Http\\Kernel->handle()
+#7 {main}
+"} 
+[2024-06-18 12:41:29] laravel.EMERGENCY: Unable to create configured logger. Using emergency logger. {"exception":"[object] (InvalidArgumentException(code: 0): Log [] is not defined. at /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Log/LogManager.php:224)
+[stacktrace]
+#0 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(138): Illuminate\\Log\\LogManager->resolve()
+#1 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(125): Illuminate\\Log\\LogManager->get()
+#2 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(693): Illuminate\\Log\\LogManager->driver()
+#3 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(376): Illuminate\\Log\\LogManager->error()
+#4 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(337): Illuminate\\Foundation\\Exceptions\\Handler->reportThrowable()
+#5 /home/u238205865/domains/classerp.es/public_html/pilatessg/app/Exceptions/Handler.php(38): Illuminate\\Foundation\\Exceptions\\Handler->report()
+#6 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(497): App\\Exceptions\\Handler->report()
+#7 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(146): Illuminate\\Foundation\\Http\\Kernel->reportException()
+#8 /home/u238205865/domains/classerp.es/public_html/pilatessg/public/index.php(54): Illuminate\\Foundation\\Http\\Kernel->handle()
+#9 {main}
+"} 
+[2024-06-18 12:41:29] laravel.ERROR: syntax error, unexpected identifier "locale", expecting ")" {"exception":"[object] (ParseError(code: 0): syntax error, unexpected identifier \"locale\", expecting \")\" at /home/u238205865/domains/classerp.es/public_html/pilatessg/config/app.php:88)
+[stacktrace]
+#0 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(72): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->loadConfigurationFile()
+#1 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(39): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->loadConfigurationFiles()
+#2 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(309): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->bootstrap()
+#3 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(186): Illuminate\\Foundation\\Application->bootstrapWith()
+#4 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(170): Illuminate\\Foundation\\Http\\Kernel->bootstrap()
+#5 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(144): Illuminate\\Foundation\\Http\\Kernel->sendRequestThroughRouter()
+#6 /home/u238205865/domains/classerp.es/public_html/pilatessg/public/index.php(54): Illuminate\\Foundation\\Http\\Kernel->handle()
+#7 {main}
+"} 
+[2024-06-18 12:41:29] laravel.EMERGENCY: Unable to create configured logger. Using emergency logger. {"exception":"[object] (InvalidArgumentException(code: 0): Log [] is not defined. at /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Log/LogManager.php:224)
+[stacktrace]
+#0 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(138): Illuminate\\Log\\LogManager->resolve()
+#1 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(125): Illuminate\\Log\\LogManager->get()
+#2 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(693): Illuminate\\Log\\LogManager->driver()
+#3 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(376): Illuminate\\Log\\LogManager->error()
+#4 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(337): Illuminate\\Foundation\\Exceptions\\Handler->reportThrowable()
+#5 /home/u238205865/domains/classerp.es/public_html/pilatessg/app/Exceptions/Handler.php(38): Illuminate\\Foundation\\Exceptions\\Handler->report()
+#6 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(497): App\\Exceptions\\Handler->report()
+#7 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(146): Illuminate\\Foundation\\Http\\Kernel->reportException()
+#8 /home/u238205865/domains/classerp.es/public_html/pilatessg/public/index.php(54): Illuminate\\Foundation\\Http\\Kernel->handle()
+#9 {main}
+"} 
+[2024-06-18 12:41:29] laravel.ERROR: syntax error, unexpected identifier "locale", expecting ")" {"exception":"[object] (ParseError(code: 0): syntax error, unexpected identifier \"locale\", expecting \")\" at /home/u238205865/domains/classerp.es/public_html/pilatessg/config/app.php:88)
+[stacktrace]
+#0 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(72): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->loadConfigurationFile()
+#1 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(39): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->loadConfigurationFiles()
+#2 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(309): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->bootstrap()
+#3 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(186): Illuminate\\Foundation\\Application->bootstrapWith()
+#4 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(170): Illuminate\\Foundation\\Http\\Kernel->bootstrap()
+#5 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(144): Illuminate\\Foundation\\Http\\Kernel->sendRequestThroughRouter()
+#6 /home/u238205865/domains/classerp.es/public_html/pilatessg/public/index.php(54): Illuminate\\Foundation\\Http\\Kernel->handle()
+#7 {main}
+"} 
+[2024-06-18 12:41:31] laravel.EMERGENCY: Unable to create configured logger. Using emergency logger. {"exception":"[object] (InvalidArgumentException(code: 0): Log [] is not defined. at /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Log/LogManager.php:224)
+[stacktrace]
+#0 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(138): Illuminate\\Log\\LogManager->resolve()
+#1 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(125): Illuminate\\Log\\LogManager->get()
+#2 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(693): Illuminate\\Log\\LogManager->driver()
+#3 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(376): Illuminate\\Log\\LogManager->error()
+#4 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(337): Illuminate\\Foundation\\Exceptions\\Handler->reportThrowable()
+#5 /home/u238205865/domains/classerp.es/public_html/pilatessg/app/Exceptions/Handler.php(38): Illuminate\\Foundation\\Exceptions\\Handler->report()
+#6 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(497): App\\Exceptions\\Handler->report()
+#7 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(146): Illuminate\\Foundation\\Http\\Kernel->reportException()
+#8 /home/u238205865/domains/classerp.es/public_html/pilatessg/public/index.php(54): Illuminate\\Foundation\\Http\\Kernel->handle()
+#9 {main}
+"} 
+[2024-06-18 12:41:31] laravel.ERROR: syntax error, unexpected identifier "locale", expecting ")" {"exception":"[object] (ParseError(code: 0): syntax error, unexpected identifier \"locale\", expecting \")\" at /home/u238205865/domains/classerp.es/public_html/pilatessg/config/app.php:88)
+[stacktrace]
+#0 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(72): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->loadConfigurationFile()
+#1 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(39): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->loadConfigurationFiles()
+#2 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(309): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->bootstrap()
+#3 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(186): Illuminate\\Foundation\\Application->bootstrapWith()
+#4 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(170): Illuminate\\Foundation\\Http\\Kernel->bootstrap()
+#5 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(144): Illuminate\\Foundation\\Http\\Kernel->sendRequestThroughRouter()
+#6 /home/u238205865/domains/classerp.es/public_html/pilatessg/public/index.php(54): Illuminate\\Foundation\\Http\\Kernel->handle()
+#7 {main}
+"} 
+[2024-06-18 12:41:31] laravel.EMERGENCY: Unable to create configured logger. Using emergency logger. {"exception":"[object] (InvalidArgumentException(code: 0): Log [] is not defined. at /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Log/LogManager.php:224)
+[stacktrace]
+#0 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(138): Illuminate\\Log\\LogManager->resolve()
+#1 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(125): Illuminate\\Log\\LogManager->get()
+#2 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(693): Illuminate\\Log\\LogManager->driver()
+#3 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(376): Illuminate\\Log\\LogManager->error()
+#4 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(337): Illuminate\\Foundation\\Exceptions\\Handler->reportThrowable()
+#5 /home/u238205865/domains/classerp.es/public_html/pilatessg/app/Exceptions/Handler.php(38): Illuminate\\Foundation\\Exceptions\\Handler->report()
+#6 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(497): App\\Exceptions\\Handler->report()
+#7 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(146): Illuminate\\Foundation\\Http\\Kernel->reportException()
+#8 /home/u238205865/domains/classerp.es/public_html/pilatessg/public/index.php(54): Illuminate\\Foundation\\Http\\Kernel->handle()
+#9 {main}
+"} 
+[2024-06-18 12:41:31] laravel.ERROR: syntax error, unexpected identifier "locale", expecting ")" {"exception":"[object] (ParseError(code: 0): syntax error, unexpected identifier \"locale\", expecting \")\" at /home/u238205865/domains/classerp.es/public_html/pilatessg/config/app.php:88)
+[stacktrace]
+#0 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(72): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->loadConfigurationFile()
+#1 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(39): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->loadConfigurationFiles()
+#2 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(309): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->bootstrap()
+#3 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(186): Illuminate\\Foundation\\Application->bootstrapWith()
+#4 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(170): Illuminate\\Foundation\\Http\\Kernel->bootstrap()
+#5 /home/u238205865/domains/classerp.es/public_html/pilatessg/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(144): Illuminate\\Foundation\\Http\\Kernel->sendRequestThroughRouter()
+#6 /home/u238205865/domains/classerp.es/public_html/pilatessg/public/index.php(54): Illuminate\\Foundation\\Http\\Kernel->handle()
+#7 {main}
+"} 

@@ -1,3 +1,4 @@
+
 @extends("$theme/layout")
 @section('title')
 Historial Clínico
@@ -120,7 +121,7 @@ Historial Clínico
                         <i class="kt-font-brand  fa fa-inbox"></i>
                     </span>
                     <h3 class="kt-portlet__head-title">
-                        Documentos
+                        Registros
                     </h3>
                 </div>
                 <div class="kt-portlet__head-toolbar">
@@ -140,8 +141,15 @@ Historial Clínico
                                             <a href="#" onclick="addDocumentClient()" class="kt-nav__link"
                                                 data-toggle="modal" data-target="#modal_add_client">
                                                 <i class="kt-nav__link-icon flaticon2-add-circular-button"></i>
-                                                <span class="kt-nav__link-text">Agregar nuevo documento</span>
+                                                <span class="kt-nav__link-text">Agregar Registro</span>
                                             </a>
+                                        </li>
+                                        <li class="kt-nav__item">
+                                            <a href="#" onclick="editDocumentClient()" class="kt-nav__link"
+                                                data-toggle="modal" data-target="#modal_edit_document_client">
+                                                <i class="kt-nav__link-icon fa fa-pencil-alt"></i>
+                                                <span class="kt-nav__link-text">Editar Registro </span>
+                                            </a> 
                                         </li>
                                         <li class="kt-nav__item">
                                             <a href="#" onclick="deleteSelectedDocuments()" id="btn-delete-rooms"
@@ -165,7 +173,7 @@ Historial Clínico
                             <a href="#" onclick="addDocumentClient()" class="btn btn-brand btn-elevate btn-icon-sm"
                                 data-toggle="modal" data-target="#modal_add_client">
                                 <i class="la la-plus"></i>
-                                Agregar Documento
+                                Nuevo Registro
                             </a>
                         </div>
                     </div>
@@ -227,7 +235,7 @@ Historial Clínico
     <div class="modal-dialog modal-sm" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Eliminar Documentos</h5>
+                <h5 class="modal-title" id="exampleModalLabel">Eliminar Registros</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 </button>
             </div>
@@ -239,7 +247,7 @@ Historial Clínico
                 <div class="modal-body">
                     <h1 class="text-uppercase text-center" style="font-size: 20px;"> <i
                             class="flaticon-danger text-danger display-1"></i> <br> Realmente desea eliminar los
-                        documentos seleccionados.</h1>
+                        registros seleccionados.</h1>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
@@ -270,7 +278,7 @@ Historial Clínico
                 <div class="modal-body">
                     <h1 class="text-uppercase text-center" style="font-size: 20px;"> <i
                             class="flaticon-danger text-danger display-1"></i> <br> Realmente desea eliminar el
-                        documento seleccionado.</h1>
+                        registro seleccionado.</h1>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
@@ -283,35 +291,54 @@ Historial Clínico
 <!--end: Modal Delete documents -->
 
 
+<!--start: Modal add document in add client -->
 <form action="{{ route('medical_history_add_document') }}" method="POST" autocomplete="off" role="presentation"
     enctype="multipart/form-data">
     @csrf
     @method('post')
     <input style="display:none">
     <input type="hidden" name="id_client" id="id-client-add-doc">
-    <!--start: Modal add document in add client -->
     <div class="modal fade" id="modal_add_document_client">
         <div class="modal-dialog modal-md">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Selecciona el documento</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Selecciona el Registro</h5>
                     <button type="button" class="close" data-dismiss="modal">
                     </button>
                 </div>
                 <div class="modal-body text-center">
                     <div class="form-group text-center">
-                        <label for="name-document" class="form-control-label">Nombre o título del documento *</label>
+                        <label for="name-document" class="form-control-label">Nombre o título del Registro *</label>
                         <input type="text" name="name_document" class="form-control text-center" id="name-document"
                             value="{{ old('name_document') }}" autocomplete="new-password">
                     </div>
-                    <small>Si el documento no tiene un reverso puede omitir la imagen o documento reverso</small>
+                    <div class="form-group text-center">
+                        <label for="date-document" class="form-control-label">Fecha del Registro</label>
+                        <input type="date" name="date_document" class="form-control text-center" id="date-document"
+                            value="{{ old('date_document') }}" autocomplete="new-password">
+                    </div>
                     <div class="row pt-4">
+                        <div class="col-12">
+                            <div class="form-group form-group-last">
+                                <label for="observation">Observaciones</label>
+                                {{-- Text Area observations or notes --}}
+                                <textarea class="form-control" name="observation" id="observation" rows="3"
+                                    style="margin-top: 0px; margin-bottom: 0px; height: 40vh; resize:none;">{{ old('observation') }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-between align-items-center w-100 px-5 py-2">
+                    <div class="btn btn-primary rounded-full " id="files-adj">
+                        Añadir Adjunto
+                    </div>
+                    <div class="d-flex">
+
                         <div class="col-6 text-center">
-                            <label class="form-control-label">Anverso</label>
                             <div class="d-flex justify-content-center align-items-center">
 
                                 <label for="img-change-front" data-toggle="kt-tooltip" data-placement="top" title=""
-                                    data-original-title="Clic para cambiar">
+                                    data-original-title="Clic para Eliminar">
                                     <img id="preview-front-document" class="preview-document"
                                         src="{{ asset('assets') }}/images/doc-front-default.png" />
                                 </label>
@@ -324,10 +351,9 @@ Historial Clínico
                         </div>
 
                         <div class="col-6 text-center">
-                            <label class="form-control-label">Reverso</label>
                             <div class="d-flex justify-content-center align-items-center">
                                 <label for="img-change-back" data-toggle="kt-tooltip" data-placement="top" title=""
-                                    data-original-title="Clic para cambiar">
+                                    data-original-title="Clic para Eliminar">
                                     <img id="preview-back-document" class="preview-document"
                                         src="{{ asset('assets') }}/images/doc-back-default.png" />
                                 </label>
@@ -337,20 +363,10 @@ Historial Clínico
                                 {{-- <small>Clic sobre la imagen para cambiar</small> --}}
                             </div>
                         </div>
-                        <div class="col-12">
-                            <div class="form-group form-group-last">
-                                <label for="observation">Observaciones</label>
-                                {{-- Text Area observations or notes --}}
-                                <textarea class="form-control" name="observation" id="observation" rows="3"
-                                    style="margin-top: 0px; margin-bottom: 0px; height: 40vh; resize:none;">{{ old('observation') }}</textarea>
-                            </div>
-                        </div>
                     </div>
-                </div>
-                <div>
-                    <button id="speech" class="btn btn-info rounded-full">
+                    <div id="speech" class="btn btn-primary rounded-full ">
                         <image id="microphone-img" src="{{ asset('assets') }}/images/microphone.png" />
-                    </button>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" class="close" data-dismiss="modal">Cancelar</button>
@@ -361,94 +377,91 @@ Historial Clínico
             </div>
         </div>
     </div>
-    <!--end: Modal add document in add client -->
 </form>
+<!--end: Modal add document in add client -->
 
 <!--start: Modal edit document client -->
-<form action="{{ route('medical_history_update_document') }}" method="POST" autocomplete="off" role="presentation"
-    enctype="multipart/form-data">
-    @csrf
-    @method('put')
-    <input style="display:none">
-    <input type="hidden" name="id" id="id-add-edit-doc">
-    <input type="hidden" name="delete_back" id="confirm-delete-back-doc">
-
-    <div class="modal fade" id="modal_edit_document_client">
-        <div class="modal-dialog modal-md">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Selecciona el documento</h5>
-                    <button type="button" class="close" data-dismiss="modal">
-                    </button>
-                </div>
-                <div class="modal-body text-center">
-                    <div class="form-group text-center">
-                        <label for="name-document-edit" class="form-control-label">Nombre o título del documento
-                            *</label>
-                        <input type="text" name="name_document" class="form-control text-center" id="name-document-edit"
-                            autocomplete="new-password">
+<div class="modal fade" id="modal_edit_document_client" tabindex="-1" role="dialog"
+    aria-labelledby="modal_edit_document_client_label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal_edit_document_client_label">Editar Registros</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" action="{{ route('medical_history_update_document')}}" id="edit-document-form"
+                    enctype="multipart/form-data">
+                    @csrf
+                    <input type="hidden" name="_method" value="PUT">
+                    <input type="hidden" id="delete-back-input" name="delete_back" value="false">
+                    <input type="hidden" id="delete-front-input" name="delete_front" value="false">
+                    <input type="hidden" name="id" id="id-document-selected">
+                    <div class="form-group">
+                        <label for="name-document-edit-val">Nombre del Registro</label>
+                        <input type="text" class="form-control" id="name-document-edit-val" name="name_document">
                     </div>
-                    <small>Si el documento no tiene un reverso puede omitir la imagen o documento reverso</small>
-                    <div class="row pt-4">
-                        <div class="col-6 text-center">
-                            <label class="form-control-label">Anverso</label>
-                            <div class="d-flex justify-content-center align-items-center">
-
-                                <label for="img-change-front-edit" data-toggle="kt-tooltip" data-placement="top"
-                                    title="" data-original-title="Clic para cambiar">
-                                    <img id="preview-front-document-edit" class="preview-document"
-                                        src="{{ asset('assets') }}/images/doc-front-default.png" />
-                                </label>
-
-                                <input type='file' id="img-change-front-edit" style="display:none" name="front"
-                                    accept="" />
-                                <br>
-                                {{-- <small>Clic sobre la imagen para cambiar</small> --}}
-                            </div>
-
+                    <div class="form-group">
+                        <label for="observation-edit">Observación</label>
+                        <textarea type="text" class="form-control" id="observation-edit" name="observation" 
+                            style="margin-top: 0px; margin-bottom: 0px; height: 40vh; resize:none;">{{ old('observation') }}</textarea>
+                    </div>
+                    <!-- Modal Editar -->
+                    <div class="d-flex justify-content-between align-items-center w-100 px-5 py-2">
+                        <div class="btn btn-primary rounded-full " id="files-adj-edit">
+                            Añadir Adjunto
                         </div>
+                        <div class="d-flex">
 
-                        <div class="col-6 text-center">
-                            <label class="form-control-label">Reverso</label>
+                            <div class="col-6 text-center">
+                                <div class="d-flex justify-content-center align-items-center">
 
+                                    <label for="img-change-front-edit" data-toggle="kt-tooltip" data-placement="top"
+                                        title="" data-original-title="Click para Cambiar">
+                                        <img id="preview-front-document-edit-val" class="preview-document"
+                                            src="{{ asset('assets') }}/images/doc-front-default.png" />
+                                    </label>
 
-                            <a href="#" onclick="confirmDeleteBack()" id="btn-delete-back" data-toggle="kt-tooltip"
-                                data-placement="top" title="" data-original-title="Eliminar reverso"
-                                class="kt-nav__link"><i
-                                    class="kt-nav__link-icon flaticon2-close-cross btn-delete-back"></i></a>
+                                    <input type='file' id="img-change-front-edit" style="display:none" name="front"
+                                        accept="" />
+                                    <br>
+                                    {{-- <small>Clic sobre la imagen para cambiar</small> --}}
+                                </div>
 
-                            <div class="d-flex justify-content-center align-items-center">
-                                <label for="img-change-back-edit" data-toggle="kt-tooltip" data-placement="top" title=""
-                                    data-original-title="Clic para cambiar">
-                                    <img id="preview-back-document-edit" class="preview-document"
-                                        src="{{ asset('assets') }}/images/doc-back-default.png" />
-                                </label>
+                            </div>
 
-                                <input type='file' id="img-change-back-edit" style="display:none" name="back"
-                                    accept="" />
-                                <br>
-                                {{-- <small>Clic sobre la imagen para cambiar</small> --}}
+                            <div class="col-6 text-center">
+                                <div class="d-flex justify-content-center align-items-center">
+                                    <label for="img-change-back-edit" data-toggle="kt-tooltip" data-placement="top" title=""
+                                        data-original-title="Clic para cambiar">
+                                        <img id="preview-back-document-edit-val" class="preview-document"
+                                            src="{{ asset('assets') }}/images/doc-back-default.png" />
+                                    </label>
+
+                                    <input type='file' id="img-change-back-edit" style="display:none" name="back"
+                                        accept="" />
+                                    <br>
+                                    {{-- <small>Clic sobre la imagen para cambiar</small> --}}
+                                </div>
                             </div>
                         </div>
-                        <div class="col-12">
-                            <div class="form-group form-group-last">
-                                <label for="observation-edit">Observaciones</label>
-                                <textarea class="form-control" name="observation" id="observation-edit" rows="3"
-                                    style="margin-top: 0px; margin-bottom: 0px; height: 137px;">{{ old('observation') }}</textarea>
-                            </div>
+                        <div id="speech-edit" class="btn btn-primary rounded-full ">
+                            <image id="microphone-img" src="{{ asset('assets') }}/images/microphone.png" />
                         </div>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" class="close" data-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Actualizar</button>
-                </div>
-
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
+</div>
 
-</form>
+
 <!--end: Modal edit document client -->
 
 

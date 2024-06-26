@@ -13,6 +13,7 @@ use App\Models\Client;
 use App\Models\Configuration;
 use App\Models\Document;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use ZipArchive;
 
@@ -23,70 +24,160 @@ class MedicalHistoryController extends Controller
     {
         return view("medical_history");
     }
-
-
-   
-
     public function updateDocument(ValidationDocumentEdit $request)
     {
-        $document = Document::where('id', $request['id'])->firstOrFail();
+        try {
 
-        Document::findOrFail($request['id'])->update(['name' => $request->name_document, 'observation' => $request->observation, 'date_update' => date("Ymd")]);
+            $document = Document::findOrFail($request->id);
+            $config = Configuration::first();
+            $pathForSaveBackupFiles = $config->path_gestor ?? config('backups.default_path_gestor');
 
-        $config = Configuration::first();
-        $pathForSaveBackupFiles = (isset($config->path_gestor)) ? $config->path_gestor : config('backups.default_path_gestor');
-
-
-        if ($request->hasFile('front')) {
-            Storage::disk('public')->delete("$pathForSaveBackupFiles/$document->front");
-
-            $ext = $request->file('front')->extension();
-            $frontDocument =  $request->file('front');
-            $documentName = $document->id_client . $document->id . "_front" . ".$ext";
-            Storage::disk('public')->put("$pathForSaveBackupFiles/$documentName", file_get_contents($frontDocument->getRealPath()));
-            Document::findOrFail($document->id)->update(['front' => $documentName, 'type_front' => $ext]);
-        }
-
-        if (!empty($request->delete_back)) {
-            if ($request->delete_back == 'true') {
-                Storage::disk('public')->delete("$pathForSaveBackupFiles/$document->back");
-                Document::findOrFail($document->id)->update(['back' => null, 'type_back' => null]);
+            $updateData = [];
+    
+            // Actualiza los campos name_document y observation si están presentes en la solicitud
+            try {
+                if ($request->filled('name_document')) {
+                    $updateData['name'] = $request->name_document;
+                }
+    
+                if ($request->filled('observation')) {
+                    $updateData['observation'] = $request->observation;
+                }
+            } catch (\Throwable $th) {
+                throw $th;
             }
-        }
+    
+            // Actualiza el documento frontal si se proporciona un nuevo archivo
+            if ($request->hasFile('front')) {
+                try {
+                    $frontFileData = $this->updateDocumentFile($document, 'front', $request->file('front'), $pathForSaveBackupFiles);
+                    $updateData = array_merge($updateData, $frontFileData);
+                } catch (\Throwable $th) {
+                    throw $th;
+                }
+            }elseif ($request->input('delete_front') === 'true') {
+                try {
+                    $this->deleteDocumentFileAndUpdateDatabase($document, 'front', $pathForSaveBackupFiles);
+                    $updateData['front'] = null;
+                    $updateData['type_front'] = null;
+                } catch (\Throwable $th) {
+                    throw $th;
+                    
+                }
+            }
 
-        if ($request->hasFile('back')) {
-            Storage::disk('public')->delete("$pathForSaveBackupFiles/$document->back");
-            $ext = $request->file('back')->extension();
-            $backDocument =  $request->file("back");
-            $documentName = $document->id_client . $document->id . "_back" . ".$ext";
-            Storage::disk('public')->put("$pathForSaveBackupFiles/$documentName", file_get_contents($backDocument->getRealPath()));
-            Document::findOrFail($document->id)->update(['back' => $documentName, 'type_back' => $ext]);
-        }
+    
+            // Elimina el documento posterior si se solicita
+            if ($request->filled('delete_back') && $request->delete_back === 'true') {
+                try {
+                    $this->deleteDocumentFile($document, 'back', $pathForSaveBackupFiles);
+                    $updateData['back'] = null;
+                    $updateData['type_back'] = null;
+                } catch (\Throwable $th) {
+                    throw $th;
+                }
+            }
+    
+            // Actualiza el documento posterior si se proporciona un nuevo archivo
+            if ($request->hasFile('back')) {
+                try {
+                    $backFileData = $this->updateDocumentFile($document, 'back', $request->file('back'), $pathForSaveBackupFiles);
+                    $updateData = array_merge($updateData, $backFileData);
+                } catch (\Throwable $th) {
+                    throw $th;
+                }
+            } elseif ($request->input('delete_back') === 'true') {
+                try {
+                    $this->deleteDocumentFileAndUpdateDatabase($document, 'back', $pathForSaveBackupFiles);
+                    $updateData['back'] = null;
+                    $updateData['type_back'] = null;
+                } catch (\Throwable $th) {
+                    throw $th;
+                }
+            }
 
-         /*auditoria: start*/Pilates::setAudit("Actualización documento id: $document->id"); /*auditoria: end*/
-        return redirect('medical_history')->with('success', 'Documento actualizado con éxito.');
+    
+            // Guarda las actualizaciones si hay datos para actualizar
+            if (!empty($updateData)) {
+                $document->update($updateData);
+            } 
+    
+            Pilates::setAudit("Actualización documento id: $document->id");
+            return redirect('medical_history')->with('success', 'Documento actualizado con éxito.');
+    
+        } catch (\Throwable $th) {
+            return redirect('medical_history')->with('error', 'Error al actualizar el documento.');
+        }
     }
-
+    
+    private function updateDocumentFile($document, $type, $file, $pathForSaveBackupFiles)
+    {
+        try {
+            $existingFilePath = "$pathForSaveBackupFiles/{$document->$type}";
+            if (Storage::disk('public')->exists($existingFilePath)) {
+                Storage::disk('public')->delete($existingFilePath);
+            }
+    
+            $ext = $file->extension();
+            $documentName = "{$document->id_client}{$document->id}_{$type}.{$ext}";
+            Storage::disk('public')->put("$pathForSaveBackupFiles/$documentName", file_get_contents($file->getRealPath()));
+    
+            return [$type => $documentName, "type_$type" => $ext];
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
+    
+    private function deleteDocumentFile($document, $type, $pathForSaveBackupFiles)
+    {
+        try {
+            $existingFilePath = "$pathForSaveBackupFiles/{$document->$type}";
+            if (Storage::disk('public')->exists($existingFilePath)) {
+                Storage::disk('public')->delete($existingFilePath);
+            }
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
+    private function deleteDocumentFileAndUpdateDatabase($document, $type, $pathForSaveBackupFiles)
+    {
+        try {
+            $existingFilePath = "$pathForSaveBackupFiles/{$document->$type}";
+            if (Storage::disk('public')->exists($existingFilePath)) {
+                Storage::disk('public')->delete($existingFilePath);
+            }
+    
+            $document->$type = null;
+            $document->{"type_$type"} = null;
+            $document->save();
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
 
 
     public function addDocument(ValidationDocument $request)
     {
-
         $config = Configuration::first();
         $pathForSaveBackupFiles = (isset($config->path_gestor)) ? $config->path_gestor : config('backups.default_path_gestor');
-
-        $document = Document::create(['name' => $request['name_document'], 'date_update' => date("Ymd"), 'id_client' => $request->id_client, 'observation' => $request->observation]);
-
+        $dateUp = now();
+        $document = Document::create([
+            'name' => $request['name_document'],
+            'date_update' => $dateUp,
+            'id_client' => $request->id_client,
+            'observation' => $request->observation,
+            'created_at' => $request->has('date_document') && !is_null($request['date_document']) ? $request['date_document'] : now()
+        ]);
         if ($request->hasFile('front')) {
             $ext = $request->file('front')->extension();
-            $frontDocument =  $request->file('front');
+            $frontDocument = $request->file('front');
             $documentName = $request->id_client . $document->id . "_front" . ".$ext";
             Storage::disk('public')->put("$pathForSaveBackupFiles/$documentName", file_get_contents($frontDocument->getRealPath()));
             Document::findOrFail($document->id)->update(['front' => $documentName, 'type_front' => $ext]);
         }
         if ($request->hasFile('back')) {
             $ext = $request->file('back')->extension();
-            $backDocument =  $request->file("back");
+            $backDocument = $request->file("back");
             $documentName = $request->id_client . $document->id . "_back" . ".$ext";
             Storage::disk('public')->put("$pathForSaveBackupFiles/$documentName", file_get_contents($backDocument->getRealPath()));
             Document::findOrFail($document->id)->update(['back' => $documentName, 'type_back' => $ext]);
@@ -94,9 +185,11 @@ class MedicalHistoryController extends Controller
 
 
 
-          /*auditoria: start*/Pilates::setAudit("Alta documento id:$document->id"); /*auditoria: end*/
+        /*auditoria: start*/
+        Pilates::setAudit("Alta documento id:$document->id"); /*auditoria: end*/
         return redirect('medical_history')->with('success', 'Documento agregado al historial del cliente con éxito.');
     }
+
 
 
     public function destroyDocument(ValidationDeleteDocument $request)
@@ -126,7 +219,8 @@ class MedicalHistoryController extends Controller
             }
         }
 
-        /*auditoria: start*/Pilates::setAudit("Baja documento ids: ".implode(', ', $idsDocument)); /*auditoria: end*/
+        /*auditoria: start*/
+        Pilates::setAudit("Baja documento ids: " . implode(', ', $idsDocument)); /*auditoria: end*/
         return $cantSuccsess <= 1 ?
             redirect('medical_history')->with('success', $cantSuccsess . ' documento eliminado con éxito.')
             :
@@ -142,11 +236,10 @@ class MedicalHistoryController extends Controller
         if ($request->ajax()) {
             $routePublicImages = asset("assets/images/");
             $routeDocuments = asset("storage/$pathForSaveBackupFiles");
-
             $documents = Document::where("id_client", $request->id)->get()->all();
             return response()->json([
                 'success' =>
-                'Documentos cargados con éxito',
+                    'Documentos cargados con éxito',
                 'error' => false,
                 'documents' => $documents,
                 'routePublicImages' => $routePublicImages,
@@ -176,7 +269,7 @@ class MedicalHistoryController extends Controller
         $pathForSaveBackupFiles = (isset($config->path_gestor)) ? $config->path_gestor : config('backups.default_path_gestor');
 
         $storagePath = "$pathForSaveBackupFiles";
-        $public_dir =  Storage::disk('public')->getDriver()->getAdapter()->getPathPrefix()."$storagePath/";
+        $public_dir = Storage::disk('public')->getDriver()->getAdapter()->getPathPrefix() . "$storagePath/";
         $zipFileName = ($request->title ?? date("Y-m-d")) . ".zip";
 
         $zip = new ZipArchive;
@@ -207,11 +300,12 @@ class MedicalHistoryController extends Controller
         $filetopath = $public_dir . $zipFileName;
 
         if (file_exists($filetopath)) {
-              /*auditoria: start*/Pilates::setAudit("Descarga historial comprimido"); /*auditoria: end*/
+            /*auditoria: start*/
+            Pilates::setAudit("Descarga historial comprimido"); /*auditoria: end*/
             return response()->download($filetopath, $zipFileName, $headers)->deleteFileAfterSend(true);
         }
-        
-      
+
+
         return redirect('medical_history')->with('warning', 'Ningún documento que comprimir.');
     }
 
@@ -224,7 +318,7 @@ class MedicalHistoryController extends Controller
         $pathForSaveBackupFiles = (isset($config->path_gestor)) ? $config->path_gestor : config('backups.default_path_gestor');
 
         $storagePath = "$pathForSaveBackupFiles";
-        $public_dir =  Storage::disk('public')->getDriver()->getAdapter()->getPathPrefix()."$storagePath/";
+        $public_dir = Storage::disk('public')->getDriver()->getAdapter()->getPathPrefix() . "$storagePath/";
         $zipFileName = ($request->title ?? date("Y-m-d")) . ".zip";
 
         $zip = new ZipArchive;
@@ -255,10 +349,11 @@ class MedicalHistoryController extends Controller
         $filetopath = $public_dir . $zipFileName;
 
         if (file_exists($filetopath)) {
-             /*auditoria: start*/Pilates::setAudit("Descarga historial comprimido"); /*auditoria: end*/
+            /*auditoria: start*/
+            Pilates::setAudit("Descarga historial comprimido"); /*auditoria: end*/
             return response()->download($filetopath, $zipFileName, $headers)->deleteFileAfterSend(true);
         }
-        
+
         return redirect('medical_history')->with('warning', 'Ningún documento para comprimir.');
     }
 
@@ -271,7 +366,7 @@ class MedicalHistoryController extends Controller
         $pathForSaveBackupFiles = (isset($config->path_gestor)) ? $config->path_gestor : config('backups.default_path_gestor');
 
         $storagePath = "$pathForSaveBackupFiles";
-        $public_dir =  Storage::disk('public')->getDriver()->getAdapter()->getPathPrefix()."$storagePath/";
+        $public_dir = Storage::disk('public')->getDriver()->getAdapter()->getPathPrefix() . "$storagePath/";
         $zipFileName = ($request->title ?? date("Y-m-d")) . ".zip";
 
         $zip = new ZipArchive;
@@ -301,7 +396,8 @@ class MedicalHistoryController extends Controller
         $filetopath = $public_dir . $zipFileName;
 
         if (file_exists($filetopath)) {
-             /*auditoria: start*/Pilates::setAudit("Descarga historial comprimido"); /*auditoria: end*/
+            /*auditoria: start*/
+            Pilates::setAudit("Descarga historial comprimido"); /*auditoria: end*/
             return response()->download($filetopath, $zipFileName, $headers)->deleteFileAfterSend(true);
         }
         return redirect('medical_history')->with('warning', 'Ningún documento que comprimir.');

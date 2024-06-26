@@ -25,7 +25,7 @@ class Employee extends Authenticatable
     protected $dates = [
         'two_factor_expires_at'
     ];
-    protected $fillable = [
+     protected $fillable = [
         'name',
         'last_name',
         'password',
