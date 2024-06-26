@@ -1,23 +1,24 @@
-@extends("$theme/layout")
-@section('title') Configuración @endsection
-@section('styles_page_vendors')
-<link href="{{asset("assets/$theme")}}/vendors/general/bootstrap-select/dist/css/bootstrap-select.css" rel="stylesheet" type="text/css">
-<link href="{{asset("assets/$theme")}}/vendors/custom/datatables/datatables.bundle.css" rel="stylesheet" type="text/css" />
-<link href="{{asset("assets/$theme")}}/vendors/general/toastr/build/toastr.css" rel="stylesheet" type="text/css" />
-<link href="{{asset("assets/$theme")}}/vendors/general/bootstrap-datepicker/dist/css/bootstrap-datepicker3.css" rel="stylesheet" type="text/css" />
-@endsection
-@section('styles_optional_vendors')
 
-@endsection
+<?php $__env->startSection('title'); ?> Configuración <?php $__env->stopSection(); ?>
+<?php $__env->startSection('styles_page_vendors'); ?>
+<link href="<?php echo e(asset("assets/$theme")); ?>/vendors/general/bootstrap-select/dist/css/bootstrap-select.css" rel="stylesheet" type="text/css">
+<link href="<?php echo e(asset("assets/$theme")); ?>/vendors/custom/datatables/datatables.bundle.css" rel="stylesheet" type="text/css" />
+<link href="<?php echo e(asset("assets/$theme")); ?>/vendors/general/toastr/build/toastr.css" rel="stylesheet" type="text/css" />
+<link href="<?php echo e(asset("assets/$theme")); ?>/vendors/general/bootstrap-datepicker/dist/css/bootstrap-datepicker3.css" rel="stylesheet" type="text/css" />
+<?php $__env->stopSection(); ?>
+<?php $__env->startSection('styles_optional_vendors'); ?>
 
-@section('content_breadcrumbs')
-{!! PilatesHelper::getBreadCrumbs([
+<?php $__env->stopSection(); ?>
+
+<?php $__env->startSection('content_breadcrumbs'); ?>
+<?php echo PilatesHelper::getBreadCrumbs([
 ["route"=>"#","name"=>"Panel de Control"],
 ["route"=>"administration_config","name"=>"Configuración"]
-]) !!}
-@endsection
+]); ?>
 
-@section('content_page')
+<?php $__env->stopSection(); ?>
+
+<?php $__env->startSection('content_page'); ?>
 
 
 <!--begin::Portlet-->
@@ -137,7 +138,7 @@
         <div class="d-flex justify-content-center align-items-center p-4">
                 <span class="kt-switch kt-switch--lg kt-switch--icon">
                         <label>
-                                <input type="checkbox" {{ (isset($config->asisstance_module_status))?(($config->asisstance_module_status=="true")?'checked="checked"':""):"" }}  onchange="updateStatusModuleAssitances(this)" id="asisstance_module_status">
+                                <input type="checkbox" <?php echo e((isset($config->asisstance_module_status))?(($config->asisstance_module_status=="true")?'checked="checked"':""):""); ?>  onchange="updateStatusModuleAssitances(this)" id="asisstance_module_status">
                                 <span></span>
                         </label>
                 </span>
@@ -174,30 +175,30 @@
 
                         <!--begin::Form-->
                         <div class="container-fluid collapse show" class="collapse" id="collapse1">
-                                <form  action="{{route('administration_config_update_fiscal_data')}}" method="POST" autocomplete="off">
+                                <form  action="<?php echo e(route('administration_config_update_fiscal_data')); ?>" method="POST" autocomplete="off">
                                 <div class="kt-portlet__body">
 
-                                                @csrf
-                                                @method('put')
+                                                <?php echo csrf_field(); ?>
+                                                <?php echo method_field('put'); ?>
                                        <div class="row">
                                         <div class="col-xs-12 col-lg-9">
                                                 <div class="form-group">
                                                         <label for="name_entity">Nombre o Entidad *</label>
-                                                        <input type="text" class="form-control" id="name_entity" name="name_entity" value="{{ ($config->name_entity)??old('name_entity','') }}"  required>
+                                                        <input type="text" class="form-control" id="name_entity" name="name_entity" value="<?php echo e(($config->name_entity)??old('name_entity','')); ?>"  required>
 
                                                 </div>
                                         </div>
                                         <div class="col-xs-12 col-lg-3">
                                                 <div class="form-group">
                                                         <label for="cif">CIF *</label>
-                                                        <input type="text" class="form-control" id="cif"  name="cif" value="{{ ($config->cif)??old('cif','') }}" required>
+                                                        <input type="text" class="form-control" id="cif"  name="cif" value="<?php echo e(($config->cif)??old('cif','')); ?>" required>
 
                                                 </div>
                                         </div>
                                         <div class="col-xs-12 col-lg-12">
                                                 <div class="form-group">
                                                         <label for="address">Dirección *</label>
-                                                        <input type="text" class="form-control" id="address" name="address" value="{{ ($config->address)??old('address','') }}" required>
+                                                        <input type="text" class="form-control" id="address" name="address" value="<?php echo e(($config->address)??old('address','')); ?>" required>
 
                                                 </div>
                                         </div>
@@ -205,7 +206,7 @@
                                         <div class="col-xs-2 col-lg-3">
                                                 <div class="form-group">
                                                         <label for="tel">Teléfono *</label>
-                                                        <input type="tel" class="form-control" id="tel"  name="tel" value="{{ ($config->tel)??old('tel','') }}" required>
+                                                        <input type="tel" class="form-control" id="tel"  name="tel" value="<?php echo e(($config->tel)??old('tel','')); ?>" required>
 
                                                 </div>
                                         </div>
@@ -213,28 +214,28 @@
                                         <div class="col-xs-2 col-lg-3">
                                                 <div class="form-group">
                                                         <label for="mobile">Móvil</label>
-                                                        <input type="tel" class="form-control" id="mobile" name="mobile" value="{{ ($config->mobile)??old('mobile','') }}">
+                                                        <input type="tel" class="form-control" id="mobile" name="mobile" value="<?php echo e(($config->mobile)??old('mobile','')); ?>">
 
                                                 </div>
                                         </div>
                                         <div class="col-xs-2 col-lg-3">
                                                 <div class="form-group">
                                                         <label for="tomo">Tomo *</label>
-                                                        <input type="text" class="form-control" id="tomo" name="tomo" value="{{ ($config->tomo)??old('tomo','') }}" required>
+                                                        <input type="text" class="form-control" id="tomo" name="tomo" value="<?php echo e(($config->tomo)??old('tomo','')); ?>" required>
 
                                                 </div>
                                         </div>
                                         <div class="col-xs-2 col-lg-3">
                                                 <div class="form-group">
                                                         <label for="folio">Folio *</label>
-                                                        <input type="text" class="form-control" id="folio" name="folio" value="{{ ($config->folio)??old('folio','') }}" required>
+                                                        <input type="text" class="form-control" id="folio" name="folio" value="<?php echo e(($config->folio)??old('folio','')); ?>" required>
 
                                                 </div>
                                         </div>
                                         <div class="col-xs-2 col-lg-3">
                                                 <div class="form-group">
                                                         <label for="num_factura"># Factura *</label>
-                                                        <input type="text" class="form-control" id="num_factura" name="num_factura" value="{{ ($config->num_factura)??old('num_factura','') }}" required>
+                                                        <input type="text" class="form-control" id="num_factura" name="num_factura" value="<?php echo e(($config->num_factura)??old('num_factura','')); ?>" required>
                                                 </div>
                                         </div>
                                        </div>
@@ -275,11 +276,11 @@
                         <!--begin::Form-->
                         <!-- START CLONE -->
                         <div class="container-fluid collapse show" class="collapse" id="collapse1">
-                                <form  action="{{route('administration_config_update_fiscal_data')}}" method="POST" autocomplete="off">
+                                <form  action="<?php echo e(route('administration_config_update_fiscal_data')); ?>" method="POST" autocomplete="off">
                                 <div class="kt-portlet__body">
 
-                                                @csrf
-                                                @method('put')
+                                                <?php echo csrf_field(); ?>
+                                                <?php echo method_field('put'); ?>
                                        <div class="row">
                                         <div class="col-xs-12 col-lg-9">
                                                 <div class="form-group">
@@ -290,45 +291,45 @@
                                         <!-- <div class="col-xs-12 col-lg-3">
                                                 <div class="form-group">
                                                         <label for="cif">CIF *</label>
-                                                        <input type="text" class="form-control" id="cif"  name="cif" value="{{ ($config->cif)??old('cif','') }}" required>
+                                                        <input type="text" class="form-control" id="cif"  name="cif" value="<?php echo e(($config->cif)??old('cif','')); ?>" required>
                                                 </div>
                                         </div>
                                         <div class="col-xs-12 col-lg-12">
                                                 <div class="form-group">
                                                         <label for="address">Dirección *</label>
-                                                        <input type="text" class="form-control" id="address" name="address" value="{{ ($config->address)??old('address','') }}" required>
+                                                        <input type="text" class="form-control" id="address" name="address" value="<?php echo e(($config->address)??old('address','')); ?>" required>
                                                 </div>
                                         </div>
                                         <div class="col-xs-2 col-lg-3">
                                                 <div class="form-group">
                                                         <label for="tel">Teléfono *</label>
-                                                        <input type="tel" class="form-control" id="tel"  name="tel" value="{{ ($config->tel)??old('tel','') }}" required>
+                                                        <input type="tel" class="form-control" id="tel"  name="tel" value="<?php echo e(($config->tel)??old('tel','')); ?>" required>
                                                 </div>
                                         </div>
                                         <div class="col-xs-2 col-lg-3">
                                                 <div class="form-group">
                                                         <label for="mobile">Móvil</label>
-                                                        <input type="tel" class="form-control" id="mobile" name="mobile" value="{{ ($config->mobile)??old('mobile','') }}">
+                                                        <input type="tel" class="form-control" id="mobile" name="mobile" value="<?php echo e(($config->mobile)??old('mobile','')); ?>">
                                                 </div>
                                         </div>
                                         <div class="col-xs-2 col-lg-3">
                                                 <div class="form-group">
                                                         <label for="tomo">Tomo *</label>
-                                                        <input type="text" class="form-control" id="tomo" name="tomo" value="{{ ($config->tomo)??old('tomo','') }}" required>
+                                                        <input type="text" class="form-control" id="tomo" name="tomo" value="<?php echo e(($config->tomo)??old('tomo','')); ?>" required>
 
                                                 </div>
                                         </div>
                                         <div class="col-xs-2 col-lg-3">
                                                 <div class="form-group">
                                                         <label for="folio">Folio *</label>
-                                                        <input type="text" class="form-control" id="folio" name="folio" value="{{ ($config->folio)??old('folio','') }}" required>
+                                                        <input type="text" class="form-control" id="folio" name="folio" value="<?php echo e(($config->folio)??old('folio','')); ?>" required>
 
                                                 </div>
                                         </div>
                                         <div class="col-xs-2 col-lg-3">
                                                 <div class="form-group">
                                                         <label for="num_factura"># Factura *</label>
-                                                        <input type="text" class="form-control" id="num_factura" name="num_factura" value="{{ ($config->num_factura)??old('num_factura','') }}" required>
+                                                        <input type="text" class="form-control" id="num_factura" name="num_factura" value="<?php echo e(($config->num_factura)??old('num_factura','')); ?>" required>
                                                 </div>
                                         </div>
                                        </div> -->
@@ -371,15 +372,15 @@
 
                                         <!--begin::Form-->
                                         <div class="container-fluid collapse show" class="collapse" id="collapse2">
-                                                <form  action="{{route('administration_config_documentary_manager_data')}}" method="POST" autocomplete="off">
-                                                @csrf
-                                                @method('put')
+                                                <form  action="<?php echo e(route('administration_config_documentary_manager_data')); ?>" method="POST" autocomplete="off">
+                                                <?php echo csrf_field(); ?>
+                                                <?php echo method_field('put'); ?>
                                                 <div class="kt-portlet__body">
                                                        <div class="row">
                                                         <div class="col-xs-12 col-lg-12">
                                                                 <div class="form-group">
                                                                         <label for="path_gestor">Ruta donde se almacenan los ficheros del gestor documental:</label>
-                                                                        <input type="text" class="form-control" id="path_gestor" name="path_gestor" value="{{ (isset($config->path_gestor))?$config->path_gestor:config('backups.default_path_gestor')}}">
+                                                                        <input type="text" class="form-control" id="path_gestor" name="path_gestor" value="<?php echo e((isset($config->path_gestor))?$config->path_gestor:config('backups.default_path_gestor')); ?>">
                                                                 </div>
                                                         </div>
                                                        </div>
@@ -423,21 +424,21 @@
 
                                         <!--begin::Form-->
                                         <div class="container-fluid collapse show" class="collapse" id="collapse3">
-                                                <form  action="{{route('administration_config_update_paths_backups_data')}}" method="POST" autocomplete="off">
-                                                        @csrf
-                                                        @method('put')
+                                                <form  action="<?php echo e(route('administration_config_update_paths_backups_data')); ?>" method="POST" autocomplete="off">
+                                                        <?php echo csrf_field(); ?>
+                                                        <?php echo method_field('put'); ?>
                                                 <div class="kt-portlet__body">
                                                        <div class="row">
                                                         <div class="col-xs-12 col-lg-12">
                                                                 <div class="form-group">
                                                                         <label for="rute_backups_day">Ruta donde se almacenan los backups de la BBDD diarios:</label>
-                                                                        <input type="text" class="form-control" name="path_backups_day" id="path_backups_day"  value="{{ (isset($config->path_backups_day))?$config->path_backups_day:config('backups.default_path_backups_day')}}">
+                                                                        <input type="text" class="form-control" name="path_backups_day" id="path_backups_day"  value="<?php echo e((isset($config->path_backups_day))?$config->path_backups_day:config('backups.default_path_backups_day')); ?>">
                                                                 </div>
                                                         </div>
                                                         <div class="col-xs-12 col-lg-12">
                                                                 <div class="form-group">
                                                                         <label for="rute_backups_week">Ruta donde se almacenan los backups de la BBDD semanales:</label>
-                                                                        <input type="text" class="form-control" name="path_backups_week" id="path_backups_week"  value="{{ (isset($config->path_backups_day))?$config->path_backups_week:config('backups.path_backups_week')}}">
+                                                                        <input type="text" class="form-control" name="path_backups_week" id="path_backups_week"  value="<?php echo e((isset($config->path_backups_day))?$config->path_backups_week:config('backups.path_backups_week')); ?>">
                                                                 </div>
                                                         </div>
                                                        </div>
@@ -470,9 +471,9 @@
 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
 </button>
 </div>
-<form action="{{route('administration_config_destroy_no_work_day')}}"  method="POST" autocomplete="off">
-@csrf
-@method('delete')
+<form action="<?php echo e(route('administration_config_destroy_no_work_day')); ?>"  method="POST" autocomplete="off">
+<?php echo csrf_field(); ?>
+<?php echo method_field('delete'); ?>
 <div id="container-ids-no-work-days-delete">
 
 </div>
@@ -499,9 +500,9 @@
 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
 </button>
 </div>
-<form action="{{route('administration_config_destroy_no_work_day')}}"  method="POST" autocomplete="off">
-@csrf
-@method('delete')
+<form action="<?php echo e(route('administration_config_destroy_no_work_day')); ?>"  method="POST" autocomplete="off">
+<?php echo csrf_field(); ?>
+<?php echo method_field('delete'); ?>
 
 <input type="hidden" name="id[]" value="" id="id_delete_no_work_day">
 
@@ -528,18 +529,18 @@
 </button>
 </div>
 
-<form action="{{route('administration_config_add_no_work_day')}}"  method="POST" autocomplete="off" role="presentation">
-@csrf
-@method('post')
+<form action="<?php echo e(route('administration_config_add_no_work_day')); ?>"  method="POST" autocomplete="off" role="presentation">
+<?php echo csrf_field(); ?>
+<?php echo method_field('post'); ?>
 <div class="modal-body text-center">
 <div class="form-group">
 <label for="kt_datepicker" class="form-control-label">Fecha *</label>
-<input type="text"  class="form-control text-center" name="date" id="kt_datepicker" value="{{old('date')}}" readonly>
+<input type="text"  class="form-control text-center" name="date" id="kt_datepicker" value="<?php echo e(old('date')); ?>" readonly>
 </div>
 
 <div class="form-group form-group-last">
 <label for="observation-edit">Descripción</label>
-<textarea class="form-control" name="description"  rows="3" style="margin-top: 0px; margin-bottom: 0px; height: 50px;">{{old('description')}}</textarea>
+<textarea class="form-control" name="description"  rows="3" style="margin-top: 0px; margin-bottom: 0px; height: 50px;"><?php echo e(old('description')); ?></textarea>
 </div>
 
 </div>
@@ -564,9 +565,9 @@
 </button>
 </div>
 
-<form action="{{route('administration_config_edit_no_work_day')}}"  method="POST" autocomplete="off" role="presentation">
-@csrf
-@method('put')
+<form action="<?php echo e(route('administration_config_edit_no_work_day')); ?>"  method="POST" autocomplete="off" role="presentation">
+<?php echo csrf_field(); ?>
+<?php echo method_field('put'); ?>
 <div class="modal-body text-center">
 <div class="form-group">
 <label for="kt_datepicker" class="form-control-label">Fecha *</label>
@@ -610,23 +611,25 @@
 </div>
 <!--end: Modal errors  -->
 
-<input type="hidden" name="_token" id="token_ajax" value="{{ Session::token() }}">
+<input type="hidden" name="_token" id="token_ajax" value="<?php echo e(Session::token()); ?>">
 
-@endsection
+<?php $__env->stopSection(); ?>
 
 
-@section('js_page_vendors')
-	<script src="{{asset("assets/$theme")}}/vendors/general/block-ui/jquery.blockUI.js" type="text/javascript"></script>
-        <script src="{{asset("assets/$theme")}}/vendors/general/bootstrap-select/dist/js/bootstrap-select.js" type="text/javascript"></script>
-        <script src="{{asset("assets/$theme")}}/vendors/custom/datatables/datatables.bundle.js" type="text/javascript"></script>
-        <script src="{{asset("assets/$theme")}}/vendors/general/toastr/build/toastr.min.js" type="text/javascript"></script>
-        <script src="{{asset("assets/$theme")}}/vendors/general/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js" type="text/javascript"></script>
-        <script src="{{asset("assets/$theme")}}/vendors/custom/components/vendors/bootstrap-datepicker/init.js" type="text/javascript"></script>
-@endsection
+<?php $__env->startSection('js_page_vendors'); ?>
+	<script src="<?php echo e(asset("assets/$theme")); ?>/vendors/general/block-ui/jquery.blockUI.js" type="text/javascript"></script>
+        <script src="<?php echo e(asset("assets/$theme")); ?>/vendors/general/bootstrap-select/dist/js/bootstrap-select.js" type="text/javascript"></script>
+        <script src="<?php echo e(asset("assets/$theme")); ?>/vendors/custom/datatables/datatables.bundle.js" type="text/javascript"></script>
+        <script src="<?php echo e(asset("assets/$theme")); ?>/vendors/general/toastr/build/toastr.min.js" type="text/javascript"></script>
+        <script src="<?php echo e(asset("assets/$theme")); ?>/vendors/general/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js" type="text/javascript"></script>
+        <script src="<?php echo e(asset("assets/$theme")); ?>/vendors/custom/components/vendors/bootstrap-datepicker/init.js" type="text/javascript"></script>
+<?php $__env->stopSection(); ?>
 
-@section('js_optional_vendors')
+<?php $__env->startSection('js_optional_vendors'); ?>
 
-@endsection
-@section('js_page_scripts')
-<script src="{{asset("assets")}}/js/page-administration-config.js" type="text/javascript"></script>
-@endsection
+<?php $__env->stopSection(); ?>
+<?php $__env->startSection('js_page_scripts'); ?>
+<script src="<?php echo e(asset("assets")); ?>/js/page-administration-config.js" type="text/javascript"></script>
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make("$theme/layout", \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH /workspaces/pilatessg/resources/views/administration_config.blade.php ENDPATH**/ ?>
