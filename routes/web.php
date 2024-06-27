@@ -157,6 +157,7 @@ Route::group(['prefix' => '/', 'middleware' => ['auth', 'twofactor','enable_empl
     //configuracion
     Route::get('administration_config', 'ConfigController@index')->name('administration_config');
     Route::put('administration_config/update_fiscal_data', 'ConfigController@updateFiscalData')->name('administration_config_update_fiscal_data');
+    Route::put('administration_config/update_ui', 'ConfigController@updateFiscalData')->name('administration_config_ui');
     Route::put('administration_config/documentary_manager_data', 'ConfigController@updateDocumentaryManagerData')->name('administration_config_documentary_manager_data');
     Route::put('administration_config/update_paths_backups_data', 'ConfigController@updateBackupsPathData')->name('administration_config_update_paths_backups_data');
     Route::post('administration_config/dataTableNoWorkDays', 'ConfigController@dataTableNoWorkDays')->name('administration_config_data_table_no_work_days');

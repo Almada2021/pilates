@@ -23,7 +23,9 @@ class ConfigController extends Controller
         return view("administration_config", compact('config'));
     }
 
-
+    public function updateDashboardLogo (Request $request){
+        
+    }
     public function updateStatusModuleAssitances(Request $request){
         $configuration = Configuration::first();
 

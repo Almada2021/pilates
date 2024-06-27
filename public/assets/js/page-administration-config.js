@@ -243,3 +243,17 @@ function sendErrorsShow(errors) {
 
 }
 
+const divUpload = document.getElementById("image-upload");
+divUpload.addEventListener("click", () => {
+    document.getElementById('image-logo-app').click();
+})
+document.getElementById('image-logo-app').addEventListener('change', function(event) {
+    var reader = new FileReader();
+    reader.onload = function() {
+        var previewImage = document.getElementById('preview-image');
+        previewImage.src = reader.result;
+        previewImage.style.display = 'block';
+    }
+    reader.readAsDataURL(event.target.files[0]);
+    document.getElementById("span-img").style.display = "none";
+});

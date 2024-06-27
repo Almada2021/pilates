@@ -70,6 +70,10 @@
         @if (PilatesHelper::getRolPermissionStatus(null,'administration_config',false))
         <li class="kt-menu__item  {{ PilatesHelper::getMenuEnable('administration_config')? 'kt-menu__item--active ' : '' }}" aria-haspopup="true"><a href="{{route('administration_config')}}" class="kt-menu__link "><i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i><span class="kt-menu__link-text">Configuración</span></a></li>
         @endif
+        {{-- Actividades --}}
+        @if (PilatesHelper::getRolPermissionStatus(null,'administration_config',false))
+        <li class="kt-menu__item  {{ PilatesHelper::getMenuEnable('administration_config')? 'kt-menu__item--active ' : '' }}" aria-haspopup="true"><a href="{{route('administration_config')}}" class="kt-menu__link "><i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i><span class="kt-menu__link-text">Actividades</span></a></li>
+        @endif
         @if(PilatesHelper::getRolPermissionStatus(null,'rol_and_permission'))
         <li class="kt-menu__item  kt-menu__item {{ PilatesHelper::getMenuEnable('rol_and_permission')?'kt-menu__item--active' : '' }}" aria-haspopup="true"><a href="{{route('rol_and_permission')}}" class="kt-menu__link "><i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i><span class="kt-menu__link-text">Roles y Permisos</span></a></li>
         @endif
