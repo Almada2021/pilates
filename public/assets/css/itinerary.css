@@ -11,7 +11,7 @@
     /* text-align: center; */
 }
 .date{
-    background-color: #c1cd29;
+    background-color: var(--primary-color);
 
 }
 .title-container h1 {

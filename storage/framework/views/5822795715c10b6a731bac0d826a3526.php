@@ -342,6 +342,25 @@
                                         </div>
                                     </div>
                                 </div>
+                                
+                                <div class="form-group">
+                                    <label for="app-colors">Colores de la App</label>
+                                    <div id="app-colors" class="row">
+                                        <div class="form-group col-xs-12 col-lg-4">
+                                            <label for="primary-color">Color Primario</label>
+                                            <input type="color" class="form-control" id="primary-color" name="primary_color" value="#BCCD00" style="width: 60px; border:none;">
+                                        </div>
+                                        <div class="form-group col-xs-12 col-lg-4">
+                                            <label for="secondary-color">Color Secundario</label>
+                                            <input type="color" class="form-control" id="secondary-color" name="secondary_color" value="#282a3c" style="width: 60px; border:none;">
+                                        </div>
+                                        <div class="form-group col-xs-12 col-lg-4">
+                                            <label for="tertiary-color">Color Terciario</label>
+                                            <input type="color" class="form-control" id="tertiary-color" name="tertiary_color" value="#ffffff" style="width: 60px; border:none;">
+                                        </div>
+                                    </div>
+                                </div>
+                                    
                             </div>
                             <div class="kt-portlet__foot">
                                 <div class="">

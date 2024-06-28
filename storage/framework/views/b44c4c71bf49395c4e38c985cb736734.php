@@ -67,10 +67,7 @@
         <?php if(PilatesHelper::getRolPermissionStatus(null,'administration_config',false)): ?>
         <li class="kt-menu__item  <?php echo e(PilatesHelper::getMenuEnable('administration_config')? 'kt-menu__item--active ' : ''); ?>" aria-haspopup="true"><a href="<?php echo e(route('administration_config')); ?>" class="kt-menu__link "><i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i><span class="kt-menu__link-text">Configuración</span></a></li>
         <?php endif; ?>
-        
-        <?php if(PilatesHelper::getRolPermissionStatus(null,'administration_config',false)): ?>
-        <li class="kt-menu__item  <?php echo e(PilatesHelper::getMenuEnable('administration_config')? 'kt-menu__item--active ' : ''); ?>" aria-haspopup="true"><a href="<?php echo e(route('administration_config')); ?>" class="kt-menu__link "><i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i><span class="kt-menu__link-text">Actividades</span></a></li>
-        <?php endif; ?>
+       
         <?php if(PilatesHelper::getRolPermissionStatus(null,'rol_and_permission')): ?>
         <li class="kt-menu__item  kt-menu__item <?php echo e(PilatesHelper::getMenuEnable('rol_and_permission')?'kt-menu__item--active' : ''); ?>" aria-haspopup="true"><a href="<?php echo e(route('rol_and_permission')); ?>" class="kt-menu__link "><i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i><span class="kt-menu__link-text">Roles y Permisos</span></a></li>
         <?php endif; ?>
@@ -143,6 +140,10 @@
     <?php if(PilatesHelper::getRolPermissionStatus(null,'management_client',false)): ?>
     <li class="kt-menu__item  <?php echo e(PilatesHelper::getMenuEnable('management_client')? 'kt-menu__item--active ' : ''); ?>" aria-haspopup="true"><a href="<?php echo e(route('management_client')); ?>" class="kt-menu__link "><i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i><span class="kt-menu__link-text">Clientes</span></a></li>
     <?php endif; ?>
+     
+     <?php if(PilatesHelper::getRolPermissionStatus(null,'administration_config',false)): ?>
+     <li class="kt-menu__item  <?php echo e(PilatesHelper::getMenuEnable('administration_config')? 'kt-menu__item--active ' : ''); ?>" aria-haspopup="true"><a href="<?php echo e(route('administration_config')); ?>" class="kt-menu__link "><i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i><span class="kt-menu__link-text">Actividades</span></a></li>
+     <?php endif; ?>
     <?php if(PilatesHelper::getRolPermissionStatus(null,'management_product',false)): ?>
     <li class="kt-menu__item  <?php echo e(PilatesHelper::getMenuEnable('management_product')? 'kt-menu__item--active ' : ''); ?>" aria-haspopup="true"><a href="<?php echo e(route('management_product')); ?>" class="kt-menu__link "><i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i><span class="kt-menu__link-text">Productos</span></a></li>
     <?php endif; ?>

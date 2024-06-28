@@ -115,13 +115,13 @@ html {
 }
 
 .inv-detail-table th {
-    background: #c1cd29;
+    background: var(--primary-color);
     padding: 10px;
     text-align: left;
 }
 
 .inv-detail-table th {
-    background: #c1cd29;
+    background: var(--primary-color);
     padding: 10px;
     text-align: left;
     color: #fff;

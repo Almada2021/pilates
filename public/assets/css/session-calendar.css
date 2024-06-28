@@ -160,7 +160,7 @@ text-align: center !important;
 
 
 .event-session.free-spaces,.event-session-for-table.free-spaces{
-background: #c1cd29;
+background: var(--primary-color);
 }
 .event-session.full,.event-session-for-table.full{
 background:  red;

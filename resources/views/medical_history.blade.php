@@ -182,7 +182,7 @@ Historial Clínico
             <div class="kt-portlet__body" id="default-content-documents">
                 <div>
                     <h1 class="text-uppercase text-center" style="font-size: 20px;">
-                        <i class="flaticon2-plus display-1" style="color:#c1cd29;"></i> <br>
+                        <i class="flaticon2-plus display-1" style="color:var(--primary-color);"></i> <br>
                         <div style="font-size:15px; text-transform:initial; color:#000;">
                             Seleccioné un cliente de la tabla izquierda para cargar su historial</div>
                     </h1>
